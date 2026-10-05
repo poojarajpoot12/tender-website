@@ -1,0 +1,111 @@
+/* ==========================================================================
+   7. INFINITE SECTOR SLIDER
+   ========================================================================== */
+.sectors-slider-section {
+  padding: 40px 0;
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+.slider-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.slider-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Outer Masking Track */
+.slider-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+/* Smooth Fade Effect on Left & Right Edges */
+.slider-container::before,
+.slider-container::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 100px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.slider-container::before {
+  left: 0;
+  background: linear-gradient(to right, #ffffff 0%, transparent 100%);
+}
+
+.slider-container::after {
+  right: 0;
+  background: linear-gradient(to left, #ffffff 0%, transparent 100%);
+}
+
+/* Sliding Track Animation */
+.slider-track {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: infiniteScroll 25s linear infinite;
+}
+
+.slider-track:hover {
+  animation-play-state: paused; /* Hover karne par animation ruk jayegi */
+}
+
+/* Individual Large Cards */
+.sector-slide-card {
+  min-width: 220px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+}
+
+.sector-slide-card:hover {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+  transform: translateY(-4px);
+}
+
+/* Bda Icon Styling */
+.sector-icon {
+  font-size: 2.5rem; /* Bda icon size */
+  line-height: 1;
+}
+
+.sector-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.sector-slide-card:hover .sector-name {
+  color: #ffffff;
+}
+
+/* Infinite Keyframes */
+@keyframes infiniteScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

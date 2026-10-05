@@ -1,0 +1,564 @@
+:root {
+  --primary-color: #14b8a6;
+  --primary-hover: #0d9488;
+  --bg-main: #f0fdf4;
+  --card-bg: #ffffff;
+  --text-dark: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #ccfbf1;
+  --border-light: #e2e8f0;
+}
+
+/* Base Wrapper & Container */
+.dashboard-wrapper {
+  background-color: var(--bg-main);
+  min-height: calc(100vh - 64px);
+  padding: 40px 5%;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* Header Card */
+.profile-header-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.05);
+  margin-bottom: 24px;
+}
+
+.profile-info-left {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.avatar-circle {
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, #14b8a6, #0d9488);
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+}
+
+.username-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.user-email-text {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.badge-verified {
+  background: #ccfbf1;
+  color: #0f766e;
+}
+
+.badge-unverified {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.signout-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.signout-btn:hover {
+  background: #f0fdf4;
+  color: var(--text-dark);
+  border-color: var(--primary-color);
+}
+
+.full-email {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 4px 0 0;
+}
+
+/* Strength Box */
+.profile-strength-box {
+  background: #f0fdf4;
+  border: 1px solid var(--border-color);
+  padding: 16px;
+  border-radius: 12px;
+  width: 260px;
+}
+
+.strength-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary-color);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.strength-sub {
+  font-size: 11px;
+  color: var(--primary-hover);
+  margin: 0;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.strength-sub:hover {
+  text-decoration: underline;
+}
+
+/* Tabs */
+.dashboard-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 2px solid var(--border-light);
+  margin-bottom: 24px;
+  overflow-x: auto;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 12px 0;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-btn:hover {
+  color: var(--primary-color);
+}
+
+.tab-btn.active {
+  color: var(--primary-color);
+  border-bottom-color: var(--primary-color);
+}
+
+/* Main Cards Grid */
+.tab-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+.content-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  margin: 0 0 4px;
+  color: var(--text-dark);
+}
+
+.sub-muted {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: block;
+}
+
+/* Usage & Content Tables */
+.usage-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.usage-table th {
+  text-align: left;
+  font-size: 11px;
+  color: var(--text-muted);
+  border-bottom: 1px solid #f1f5f9;
+  padding: 12px 0;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.usage-table td {
+  padding: 16px 0;
+  border-bottom: 1px solid #f8fafc;
+  font-size: 13px;
+  color: var(--text-dark);
+}
+
+.today-tag {
+  background: #f0fdf4;
+  color: var(--primary-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  font-weight: 600;
+  font-size: 11px;
+}
+
+/* Promo & Feature Cards */
+.promo-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1px solid var(--border-color);
+}
+
+.promo-badge {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--primary-hover);
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.promo-card h4 {
+  font-size: 18px;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+}
+
+.promo-card p {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.promo-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  font-size: 12px;
+  color: var(--text-dark);
+}
+
+.promo-features li {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-icon {
+  color: var(--primary-color);
+  font-weight: bold;
+}
+
+/* Primary Action Buttons */
+.btn-verify-mobile {
+  width: 100%;
+  background: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-verify-mobile:hover {
+  background: var(--primary-hover);
+}
+
+/* Forms & Textareas */
+.dashboard-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  color: var(--text-dark);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.dashboard-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+.dashboard-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text-dark);
+  background: #ffffff;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.dashboard-textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.1);
+}
+
+/* Empty States & Placeholders */
+.tab-placeholder {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Responsive Media Queries */
+@media (max-width: 850px) {
+  .profile-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .profile-strength-box {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .tab-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-tabs {
+    gap: 16px;
+  }
+}
+/* AccountDashboard.css - Sirf JSX se nikali gayi CSS */
+
+.plans-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-price {
+  font-size: 28px;
+  color: #1e293b;
+  margin: 12px 0 4px 0;
+}
+
+.plan-price-sub {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.plans-enterprise-badge {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.profile-section-column {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: bold;
+  color: #475569;
+}
+
+.otp-box {
+  background: #f8fafc;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+}
+
+.otp-msg {
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.otp-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-margin {
+  margin-top: 4px;
+}
+
+.notifications-list {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-info {
+  /* wrapper div inside notification item */
+}
+
+.notification-title {
+  font-size: 14px;
+}
+
+.checklist-list {
+  margin-top: 12px;
+}
+
+.keyword-input-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.keyword-chip {
+  background: #e0f2fe;
+  color: #0369a1;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.keyword-remove-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #0369a1;
+  font-weight: bold;
+}
+
+.status-msg-success {
+  color: #16a34a;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Margin Utility Classes from inline styles */
+.margin-top-16 {
+  margin-top: 16px;
+}
+
+.margin-bottom-12 {
+  margin-bottom: 12px;
+}
+
+.margin-0 {
+  margin: 0;
+}
+/* Teeno cards ko 1 row me lane ke liye grid container */
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 barabar columns */
+  gap: 20px;
+  align-items: stretch; /* Teeno cards ki height barabar rahegi */
+}
+
+/* Card layout fix - content aur button bottom me push karne ke liye */
+.plans-grid .content-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+/* Mobile & Tablet responsive behavior */
+@media (max-width: 992px) {
+  .plans-grid {
+    grid-template-columns: 1fr; /* Choti screens par 1 row me 1 card aayega */
+  }
+}

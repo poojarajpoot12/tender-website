@@ -1,0 +1,192 @@
+/* Header Main Background & Container */
+.navbar-container {
+  background-color: #0f172a; /* Dark Slate Color */
+  color: #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 16px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Left Side Logo Styling */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  z-index: 60; /* Stay above mobile overlay if needed */
+}
+
+.logo-badge {
+  background-color: #14b8a6; /* Teal Color */
+  color: #0f172a;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logo-subtext {
+  color: #2dd4bf; /* Light Teal Accent */
+  font-size: 11px;
+  font-weight: 800;
+  margin-left: 2px;
+}
+
+/* Navigation Links (Desktop Default) */
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav-item {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color 0.2s ease-in-out;
+}
+
+.nav-item:hover {
+  color: #2dd4bf; /* Hover accent */
+}
+
+/* Alerts Link Accent */
+.nav-alert {
+  color: #2dd4bf;
+  font-weight: 600;
+}
+
+/* Login Button */
+.btn-login {
+  background-color: #14b8a6;
+  color: #0f172a;
+  font-weight: 700;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-decoration: none;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-login:hover {
+  background-color: #2dd4bf;
+}
+
+/* Logout Button */
+.btn-logout {
+  background-color: #334155;
+  color: #cbd5e1;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.btn-logout:hover {
+  background-color: #475569;
+}
+
+/* Hamburger Icon Styling (Hidden on Desktop) */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 26px;
+  height: 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 60;
+}
+
+.hamburger .bar {
+  width: 100%;
+  height: 2.5px;
+  background-color: #ffffff;
+  border-radius: 2px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Hamburger Active Animation (Transforms to an 'X') */
+.hamburger.active .bar:nth-child(1) {
+  transform: translateY(8.5px) rotate(45deg);
+}
+
+.hamburger.active .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.active .bar:nth-child(3) {
+  transform: translateY(-8.5px) rotate(-45deg);
+}
+
+/* Mobile Responsiveness (Screen sizes smaller than 900px) */
+@media screen and (max-width: 900px) {
+  .hamburger {
+    display: flex;
+  }
+
+  .navbar-links {
+    position: fixed;
+    top: 64px; /* Starts right below header */
+    left: 0;
+    width: 100%;
+    height: calc(100vh - 64px);
+    background-color: #0f172a;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 24px 16px;
+    gap: 20px;
+    
+    /* Off-screen hide state */
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  /* Slide in menu when active */
+  .navbar-links.active {
+    transform: translateX(0);
+  }
+
+  .nav-item {
+    font-size: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .btn-login,
+  .btn-logout {
+    width: 100%;
+    padding: 12px;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+}

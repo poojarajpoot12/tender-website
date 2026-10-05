@@ -1,0 +1,329 @@
+/* Container & Base Layout */
+.sector-container {
+  padding: 0;
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  color: #0f172a;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Full Width Hero Banner Fix (500px Height & Full Screen) */
+.heroSector {
+  width: 100vw;
+  height: 500px;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  overflow: hidden;
+  margin-bottom: 32px;
+}
+
+.heroSector img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* Header Section & Wrapper Spacing */
+.sector-header,
+.sector-grid,
+.tender-grid,
+.active-banner {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  box-sizing: border-box;
+}
+
+.sector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 18px;
+}
+
+.sector-title {
+  font-size: 20px;
+  color: #0f172a;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.sector-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.back-btn {
+  background-color: #ffffff;
+  color: #2563eb;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.back-btn:hover {
+  background-color: #eff6ff;
+  border-color: #93c5fd;
+}
+
+/* Grid Layouts */
+.sector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 24px;
+  padding-bottom: 40px;
+}
+
+.tender-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  gap: 24px;
+  padding-bottom: 40px;
+}
+
+/* Category & Sector Cards */
+.sector-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.sector-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+}
+
+.sector-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.sector-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.sector-card-count {
+  font-size: 13px;
+  color: #14b8a6;
+  font-weight: 600;
+}
+
+.sector-card-amount {
+  font-size: 18px;
+  font-weight: 800;
+  color: #14b8a6;
+}
+
+.sector-card-awards {
+  font-size: 12px;
+  color: #64748b;
+  text-align: right;
+}
+
+.divider {
+  height: 1px;
+  background-color: #f1f5f9;
+  margin: 18px 0;
+}
+
+/* Sub-category Chips */
+.chips-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.subcat-chip {
+  border: 1px solid #cbd5e1;
+  background-color: #f8fafc;
+  color: #334155;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.subcat-chip:hover {
+  background-color: #e0f2fe;
+  border-color: #38bdf8;
+  color: #0369a1;
+}
+
+.chip-amount {
+  color: #14b8a6;
+  font-size: 11px;
+  font-weight: 700;
+  background-color: #fee2e2;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+/* Active Category Alert Banner */
+.active-banner {
+  background-color: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 24px;
+  color: #047857;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Tender Detail Cards */
+.tender-card {
+  background-color: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.tender-badge {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.tender-id {
+  color: #64748b;
+  font-size: 13px;
+  font-family: monospace;
+}
+
+.tender-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 14px 0 6px 0;
+  line-height: 1.4;
+}
+
+.tender-dept {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+/* Bidder Details Block */
+.bidder-box {
+  background-color: #f8fafc;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  margin: 18px 0;
+}
+
+.bidder-winner-tag {
+  background-color: #dcfce7;
+  color: #15803d;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.bidder-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.bidder-name.revealed {
+  color: #0f172a;
+}
+
+.bidder-name.masked {
+  color: #cbd5e1;
+  letter-spacing: 2px;
+}
+
+.bidder-amount {
+  font-weight: 700;
+  font-size: 14px;
+  color: #2563eb;
+}
+
+/* Buttons */
+.btn-wrapper {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-reveal {
+  flex: 1;
+  border: 1px solid #fcd34d;
+  background-color: #fffbeb;
+  color: #b45309;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reveal:hover {
+  background-color: #fef3c7;
+}
+
+.btn-open {
+  flex: 1;
+  border: 1px solid #2563eb;
+  background-color: #2563eb;
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-open:hover {
+  background-color: #1d4ed8;
+}
+
+.no-records {
+  grid-column: 1 / -1;
+  background-color: #ffffff;
+  padding: 40px;
+  border-radius: 12px;
+  text-align: center;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}

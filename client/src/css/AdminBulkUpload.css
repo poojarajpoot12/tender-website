@@ -1,0 +1,217 @@
+/* ==========================================================================
+   ADMIN BULK UPLOAD DASHBOARD STYLES
+   ========================================================================== */
+
+.admin-upload-container {
+  max-width: 860px;
+  margin: 40px auto;
+  padding: 32px 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+}
+
+/* Header Section */
+.admin-upload-header {
+  margin-bottom: 28px;
+  text-align: left;
+}
+
+.admin-upload-header h2 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-upload-header p {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Status Alert Message */
+.upload-alert-message {
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.upload-alert-message.success {
+  background-color: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.upload-alert-message.error {
+  background-color: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Options Card Wrapper */
+.upload-card-wrapper {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease-in-out;
+}
+
+.upload-card-wrapper:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.05);
+}
+
+.card-title-group {
+  margin-bottom: 16px;
+}
+
+.card-title-group h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-title-group p {
+  color: #64748b;
+  font-size: 0.88rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Form Layouts */
+.upload-form-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.custom-file-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 10px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background-color: #f8fafc;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.custom-file-input:focus {
+  border-color: #2563eb;
+  background-color: #ffffff;
+}
+
+.custom-text-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 11px 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.custom-text-input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+/* Buttons */
+.upload-action-btn {
+  padding: 11px 22px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.upload-action-btn.btn-excel {
+  background-color: #2563eb;
+}
+
+.upload-action-btn.btn-excel:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.upload-action-btn.btn-google {
+  background-color: #16a34a;
+}
+
+.upload-action-btn.btn-google:hover:not(:disabled) {
+  background-color: #15803d;
+}
+
+.upload-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Formatting Help Box */
+.formatting-guide-box {
+  background-color: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 32px;
+}
+
+.formatting-guide-box h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+  margin: 0 0 10px 0;
+}
+
+.formatting-guide-box ul {
+  margin: 0;
+  padding-left: 20px;
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .upload-form-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .upload-action-btn {
+    width: 100%;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -1,0 +1,379 @@
+/* ==========================================================================
+   TENDERS PAGE STYLES (HORIZONTAL TOP FILTERS & FULL-WIDTH FEED)
+   ========================================================================== */
+
+.tenders-page-wrapper {
+  background-color: #f8fafc;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #0f172a;
+}
+
+/* Hero Header Section */
+.tenders-hero-banner {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.82)), 
+              url('https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  color: #ffffff;
+  padding: 40px 20px 48px 20px;
+  text-align: center;
+}
+
+.hero-content-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #14b8a6;
+  margin-bottom: 16px;
+}
+
+.pulsing-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #14b8a6;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #14b8a6;
+}
+
+.tenders-hero-banner h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+  color: #ffffff;
+}
+
+.tenders-hero-banner p {
+  color: #94a3b8;
+  font-size: 1rem;
+  margin-bottom: 24px;
+}
+
+/* Unified Search Bar */
+.unified-banner-search {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 6px;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+  margin-bottom: 16px;
+}
+
+.search-stage-dropdown {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 700;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.search-keyword-input {
+  flex: 1;
+  border: none;
+  padding: 12px 16px;
+  font-size: 1rem;
+  color: #0f172a;
+  outline: none;
+}
+
+.search-submit-btn {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-submit-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Quick Tags */
+.hero-quick-tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+.tag-chip {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tag-chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Main Container */
+.tenders-page-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 20px 60px 20px;
+}
+
+/* Horizontal Filters Bar */
+.horizontal-filter-bar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+}
+
+.horizontal-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.horizontal-filter-header h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin: 0;
+  color: #0f172a;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.horizontal-filter-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.top-filter-select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+}
+
+.horizontal-value-buckets {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.buckets-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.buckets-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.bucket-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bucket-btn.active {
+  background: #0f172a;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+/* Full Width Feed Container */
+.tenders-fullwidth-feed {
+  width: 100%;
+}
+
+.results-summary {
+  font-size: 0.95rem;
+  color: #475569;
+  margin-bottom: 16px;
+  background: #ffffff;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.tenders-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.modern-tender-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px 24px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.modern-tender-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.08);
+  border-color: #cbd5e1;
+}
+
+.card-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tender-id-badge {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.sector-pill-tag {
+  background-color: #eff6ff;
+  color: #14b8a6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tender-main-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.auth-name {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 14px 0;
+}
+
+.meta-info {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  background-color: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #334155;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.apply-btn {
+  display: inline-block;
+  background-color: #14b8a6;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.apply-btn:hover {
+  background-color: #0f172a;
+}
+
+/* Empty & Loading States */
+.empty-tenders-card, .loading-state-card {
+  text-align: center;
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  padding: 48px 20px;
+}
+
+.reset-btn {
+  padding: 10px 20px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reset-btn:hover {
+  background-color: #14b8a6;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .unified-banner-search {
+    flex-direction: column;
+  }
+
+  .horizontal-value-buckets {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .meta-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
