@@ -2,17 +2,7 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
 const User = require('../models/User');
-
-// Transporter setup (Nodemailer)
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 // ==========================================
 // 1. SEND EMAIL OTP ROUTE
@@ -28,97 +18,91 @@ router.post('/send-otp', async (req, res) => {
     const cleanEmail = String(email).toLowerCase().trim();
     const cleanPassword = String(password).trim();
 
-    let user = await User.findOne({ email: cleanEmail });
-    
-    // Generate 6-digit OTP strictly as a string
+    // Check if user is already registered and verified
+    const existingUser = await User.findOne({ email: cleanEmail });
+    if (existingUser && existingUser.isVerified) {
+      return res.status(400).json({ message: 'Email is already verified. Please login.' });
+    }
+
     const generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
     const hashedPassword = await bcrypt.hash(cleanPassword, 10);
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes expiry
+    const otpExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins expiry
 
-    if (!user) {
-      user = new User({
-        email: cleanEmail,
-        password: hashedPassword,
-        isVerified: false,
-        otp: generatedOTP,
-        otpExpires: otpExpires
-      });
-    } else {
-      user.password = hashedPassword;
-      user.otp = generatedOTP;
-      user.otpExpires = otpExpires;
-    }
-
-    await user.save();
+    // Save or update unverified user record
+    await User.findOneAndUpdate(
+      { email: cleanEmail },
+      {
+        $set: {
+          email: cleanEmail,
+          password: hashedPassword,
+          otp: generatedOTP,
+          otpExpires: otpExpires,
+          isVerified: false
+        }
+      },
+      { new: true, upsert: true }
+    );
 
     console.log("\n==========================================");
-    console.log(`🔑 TEST OTP FOR [${cleanEmail}]: ${generatedOTP}`);
+    console.log(`🔑 OTP GENERATED FOR [${cleanEmail}]: ${generatedOTP}`);
     console.log("==========================================\n");
 
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-      try {
-        await transporter.sendMail({
-          from: '"InfraLens Tenders" <no-reply@infralens.com>',
-          to: cleanEmail,
-          subject: 'Verification Code for InfraLens Tenders',
-          text: `Your OTP verification code is: ${generatedOTP}`
-        });
-        return res.status(200).json({ message: 'OTP sent successfully to your email!' });
-      } catch (emailErr) {
-        console.warn('⚠️ Email delivery failed, falling back to Terminal OTP log.');
-      }
-    }
-
-    return res.status(200).json({ message: 'OTP generated! Check backend terminal for code.' });
+    return res.status(200).json({
+      message: 'OTP generated successfully!',
+      otp: generatedOTP
+    });
   } catch (err) {
     console.error('Send OTP Error:', err);
-    return res.status(500).json({ message: err.message || 'Internal Server Error' });
+    return res.status(500).json({ message: err.message || 'Server error during OTP generation' });
   }
 });
 
 // ==========================================
-// 2. VERIFY EMAIL OTP & COMPLETE REGISTRATION
+// 2. VERIFY EMAIL OTP ROUTE
 // ==========================================
 router.post('/verify-otp', async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    console.log("📩 INCOMING VERIFY BODY:", req.body);
+    const email = req.body.email;
+    const otpInput = req.body.otp || req.body.code || req.body.otpCode;
 
-    if (!email || !otp) {
-      return res.status(400).json({ message: 'Email and OTP are required' });
+    if (!email || !otpInput) {
+      console.log("❌ REJECTED 400: Email or OTP missing in body");
+      return res.status(400).json({ message: 'Both email and OTP code are required.' });
     }
 
     const cleanEmail = String(email).toLowerCase().trim();
-    const inputOtp = String(otp).trim();
+    const cleanOtp = String(otpInput).trim();
 
-    console.log(`\n📩 VERIFY ATTEMPT -> Email: "${cleanEmail}" | Entered OTP: "${inputOtp}"`);
-
+    // Find user using case-insensitive match
     const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
-      console.log("❌ ERROR: User not found in MongoDB.");
-      return res.status(400).json({ message: 'User not found. Please click Get OTP again.' });
+      console.log(`❌ REJECTED 400: No record found for ${cleanEmail}`);
+      return res.status(400).json({ message: 'User record not found. Click Get OTP again.' });
     }
 
-    const storedOtp = user.otp ? String(user.otp).trim() : null;
-    console.log(`🔑 DB RECORD -> Stored OTP: "${storedOtp}" | Expires: ${user.otpExpires}`);
+    const storedOtp = user.otp ? String(user.otp).trim() : '';
 
-    if (!storedOtp || storedOtp !== inputOtp) {
-      console.log(`❌ ERROR: OTP Mismatch! Provided: [${inputOtp}] vs Stored: [${storedOtp}]`);
-      return res.status(400).json({ message: 'Incorrect OTP. Please enter the latest code from terminal.' });
+    console.log(`🔍 COMPARING -> DB OTP: "${storedOtp}" | INPUT OTP: "${cleanOtp}"`);
+
+    if (!storedOtp || storedOtp !== cleanOtp) {
+      console.log("❌ REJECTED 400: OTP Mismatch");
+      return res.status(400).json({ message: 'Invalid OTP code. Please re-check.' });
     }
 
     if (!user.otpExpires || new Date(user.otpExpires).getTime() < Date.now()) {
-      console.log("❌ ERROR: OTP Expired.");
-      return res.status(400).json({ message: 'OTP has expired. Please request a new one.' });
+      console.log("❌ REJECTED 400: OTP Expired");
+      return res.status(400).json({ message: 'OTP has expired. Request a new code.' });
     }
 
-    // Success: Mark verified & clear temporary OTP fields
+    // Success Verification
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
+    user.otp = null;
+    user.otpExpires = null;
     await user.save();
 
-    console.log("✅ SUCCESS: User verified successfully!");
+    console.log(`✅ VERIFICATION SUCCESSFUL FOR: ${cleanEmail}`);
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
@@ -127,18 +111,19 @@ router.post('/verify-otp', async (req, res) => {
     );
 
     return res.status(200).json({
-      message: 'Registration successful!',
+      message: 'Account verified successfully!',
       token,
       user: {
         id: user._id,
         email: user.email,
         name: user.name || '',
+        companyName: user.companyName || '',
         isVerified: user.isVerified
       }
     });
   } catch (err) {
     console.error('Verify OTP Error:', err);
-    return res.status(500).json({ message: err.message || 'Internal Server Error' });
+    return res.status(500).json({ message: err.message || 'Server error during verification' });
   }
 });
 
@@ -161,12 +146,12 @@ router.post('/login', async (req, res) => {
     }
 
     if (!user.isVerified) {
-      return res.status(400).json({ message: 'Email not verified. Please complete OTP verification.' });
+      return res.status(400).json({ message: 'Account not verified. Please complete OTP verification.' });
     }
 
     const isMatch = await bcrypt.compare(String(password).trim(), user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials. Password incorrect.' });
+      return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
     const token = jwt.sign(
@@ -188,12 +173,12 @@ router.post('/login', async (req, res) => {
     });
   } catch (err) {
     console.error('Login Error:', err);
-    return res.status(500).json({ message: err.message || 'Internal Server Error' });
+    return res.status(500).json({ message: err.message || 'Server error during login' });
   }
 });
 
 // ==========================================
-// 4. SEND MOBILE OTP
+// 4. SEND MOBILE OTP ROUTE
 // ==========================================
 router.post('/send-mobile-otp', async (req, res) => {
   try {
@@ -202,66 +187,90 @@ router.post('/send-mobile-otp', async (req, res) => {
       return res.status(400).json({ message: 'Email and Mobile Number are required.' });
     }
 
-    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
-    if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
-    }
-
+    const cleanEmail = String(email).toLowerCase().trim();
     const mobileOtp = Math.floor(100000 + Math.random() * 900000).toString();
     const mobileOtpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    user.mobileNumber = String(mobileNumber).trim();
-    user.mobileOtp = mobileOtp;
-    user.mobileOtpExpires = mobileOtpExpires;
-    user.isMobileVerified = false;
-    await user.save();
+    const user = await User.findOneAndUpdate(
+      { email: cleanEmail },
+      {
+        $set: {
+          mobileNumber: String(mobileNumber).trim(),
+          mobileOtp: mobileOtp,
+          mobileOtpExpires: mobileOtpExpires,
+          isMobileVerified: false
+        }
+      },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User record not found.' });
+    }
 
     console.log("\n==========================================");
-    console.log(`📱 MOBILE TEST OTP FOR [${mobileNumber}]: ${mobileOtp}`);
+    console.log(`📱 MOBILE OTP FOR [${mobileNumber}]: ${mobileOtp}`);
     console.log("==========================================\n");
 
-    return res.status(200).json({ message: 'Mobile OTP generated! Check backend terminal.' });
+    return res.status(200).json({ 
+      message: 'Mobile OTP generated! Check backend terminal.', 
+      otp: mobileOtp 
+    });
   } catch (err) {
     console.error('Send Mobile OTP Error:', err);
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message || 'Server error during mobile OTP generation' });
   }
 });
 
 // ==========================================
-// 5. VERIFY MOBILE OTP
+// 5. VERIFY MOBILE OTP ROUTE (ADDED & FIXED)
 // ==========================================
 router.post('/verify-mobile-otp', async (req, res) => {
   try {
-    const { email, otp } = req.body;
+    const { email, mobileNumber, otp } = req.body;
+
     if (!email || !otp) {
       return res.status(400).json({ message: 'Email and OTP are required.' });
     }
 
-    const user = await User.findOne({ email: String(email).toLowerCase().trim() });
+    const cleanEmail = String(email).toLowerCase().trim();
+    const cleanOtp = String(otp).trim();
+
+    const user = await User.findOne({ email: cleanEmail });
+
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'User record not found.' });
     }
 
-    const inputOtp = String(otp).trim();
-    const storedMobileOtp = user.mobileOtp ? String(user.mobileOtp).trim() : null;
+    const storedMobileOtp = user.mobileOtp ? String(user.mobileOtp).trim() : '';
 
-    if (!storedMobileOtp || storedMobileOtp !== inputOtp) {
-      return res.status(400).json({ message: 'Incorrect Mobile OTP.' });
+    if (!storedMobileOtp || storedMobileOtp !== cleanOtp) {
+      return res.status(400).json({ message: 'Invalid OTP code. Please re-check.' });
     }
 
     if (!user.mobileOtpExpires || new Date(user.mobileOtpExpires).getTime() < Date.now()) {
-      return res.status(400).json({ message: 'Mobile OTP has expired.' });
+      return res.status(400).json({ message: 'OTP has expired. Please request a new code.' });
     }
 
+    // Success Verification
     user.isMobileVerified = true;
-    user.mobileOtp = undefined;
-    user.mobileOtpExpires = undefined;
+    user.mobileOtp = null;
+    user.mobileOtpExpires = null;
+    if (mobileNumber) {
+      user.mobileNumber = String(mobileNumber).trim();
+    }
     await user.save();
 
-    return res.status(200).json({ message: 'Mobile Number Verified Successfully!', isMobileVerified: true });
+    console.log(`✅ MOBILE VERIFICATION SUCCESSFUL FOR: ${cleanEmail}`);
+
+    return res.status(200).json({
+      message: 'Mobile number verified successfully!',
+      isMobileVerified: true,
+      mobileNumber: user.mobileNumber
+    });
   } catch (err) {
     console.error('Verify Mobile OTP Error:', err);
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message || 'Server error during mobile OTP verification' });
   }
 });
 

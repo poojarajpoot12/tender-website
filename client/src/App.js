@@ -13,6 +13,11 @@ import TenderDetailPage from './components/TenderDetailPage'; // Import Tender D
 import AdminDashboard from './components/AdminDashboard';
 import AdminProtectedRoute from './components/AdminProtectedRoute';
 import SectorPage from './components/SectorPage';
+import BidderCard from './components/BidderCard';
+import BidderPage from './components/BidderPage';
+import AuthorityPage from './components/AuthorityPage';
+import TenderResultsPage from './components/TenderResultsPage';
+import DepartmentPage from './components/DepartmentPage';
 
 function App() {
   const [tenders, setTenders] = useState([]);
@@ -62,8 +67,13 @@ function App() {
           {/* Tenders List & Dynamic Single Tender Detail Route */}
           <Route path="/tenders" element={<TendersPage />} />
           <Route path="/tender/:id" element={<TenderDetailPage />} />
-
+          <Route path='/bidder' element={<BidderCard/>}/>
           <Route path="/sectors" element={<SectorPage />} />
+          <Route path="/bidders" element={<BidderPage />} />
+          <Route path="/authorities" element={<AuthorityPage/>}/>
+          <Route path="/results" element={<TenderResultsPage/>}/>
+          <Route path="/departments" element={<DepartmentPage/>}/>
+
 
           {/* Admin Protected Route */}
           <Route 
@@ -76,7 +86,7 @@ function App() {
           />
 
           {/* Login Route */}
-          <Route 
+          <Route  
             path="/login" 
             element={renderLoginRoute()} 
           />

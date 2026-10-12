@@ -4,83 +4,70 @@ import '../css/Login.css';
 
 export default function Login({ onLoginSuccess }) {
   const [isRegister, setIsRegister] = useState(false);
-  const [step, setStep] = useState(1); // Step 1: Email/Pass, Step 2: OTP
+  const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
+  const [registeredEmail, setRegisteredEmail] = useState(''); // Locked email for OTP step
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
-  // Predefined Fixed Admin Credentials
   const ADMIN_EMAIL = 'admin@tender.com';
   const ADMIN_PASSWORD = 'admin123';
 
-  // Send OTP or Handle Login
+  // Handle Form Submit (Login / Get OTP)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
     setLoading(true);
 
     const cleanEmail = email.trim().toLowerCase();
     const cleanPassword = password.trim();
 
-    // ========================================================
-    // 1. PREDEFINED ADMIN LOGIN CHECK
-    // ========================================================
     if (!isRegister && cleanEmail === ADMIN_EMAIL.toLowerCase() && cleanPassword === ADMIN_PASSWORD) {
-      const adminUser = {
-        name: 'Super Admin',
-        email: ADMIN_EMAIL,
-        role: 'admin'
-      };
-
+      const adminUser = { name: 'Super Admin', email: ADMIN_EMAIL, role: 'admin' };
       localStorage.setItem('token', 'fixed-admin-token-2026');
       localStorage.setItem('user', JSON.stringify(adminUser));
-      
       if (onLoginSuccess) onLoginSuccess(adminUser);
-
       setLoading(false);
       navigate('/admin');
       return;
     }
 
-    // ========================================================
-    // 2. NORMAL USER REGISTER & LOGIN FLOW
-    // ========================================================
     if (isRegister && step === 1) {
       try {
-        const res = await fetch('http://localhost:5000/api/auth/send-otp', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),
         });
         
         const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || 'OTP send karne me viphalta hui');
-        }
+        if (!res.ok) throw new Error(data.message || 'Failed to send OTP.');
         
-        setStep(2); // Move to OTP Screen
+        setRegisteredEmail(cleanEmail); // Save locked email for verification
+        setSuccessMessage('OTP generated! Check backend terminal.');
+        setStep(2);
       } catch (err) {
         setErrorMessage(err.message);
       } finally {
         setLoading(false);
       }
     } else if (!isRegister) {
-      // Direct User Login Logic
       try {
-        const res = await fetch('http://localhost:5000/api/auth/login', {
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: cleanEmail, password: cleanPassword }),
         });
 
         const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || 'Login viphal raha. Kripya credentials check karein.');
-        }
+        if (!res.ok) throw new Error(data.message || 'Login failed.');
 
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
@@ -99,35 +86,34 @@ export default function Login({ onLoginSuccess }) {
     }
   };
 
-  // Verify OTP Action
+  // Verify OTP Function
   const handleVerifyOTP = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
     setLoading(true);
 
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanOtp = String(otp).trim(); // Strictly string conversion to avoid 400 bad request
+    const targetEmail = (registeredEmail || email).trim().toLowerCase();
+    const cleanOtp = String(otp).trim();
 
     if (!cleanOtp || cleanOtp.length !== 6) {
-      setErrorMessage('Kripya 6-digit OTP enter karein.');
+      setErrorMessage('Please enter 6-digit OTP code.');
       setLoading(false);
       return;
     }
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const res = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          email: cleanEmail, 
-          otp: cleanOtp 
+          email: targetEmail, 
+          otp: cleanOtp
         }),
       });
 
       const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || 'OTP verification fail ho gaya');
-      }
+      if (!res.ok) throw new Error(data.message || 'OTP verification failed.');
 
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
@@ -146,10 +132,11 @@ export default function Login({ onLoginSuccess }) {
       <div className="auth-card">
         <div className="auth-header">
           <h2>{isRegister ? (step === 1 ? 'Create Account' : 'Enter Verification OTP') : 'Welcome Back'}</h2>
-          <p>{step === 2 ? 'Check your VS Code Backend Terminal for the 6-digit code' : 'Enter credentials to proceed'}</p>
+          <p>{step === 2 ? `OTP sent for ${registeredEmail || email}` : 'Enter credentials to proceed'}</p>
         </div>
 
         {errorMessage && <div className="auth-error-alert">⚠️ {errorMessage}</div>}
+        {successMessage && <div className="auth-success-alert">✅ {successMessage}</div>}
 
         {step === 1 ? (
           <form onSubmit={handleSubmit} className="auth-form">
@@ -184,7 +171,7 @@ export default function Login({ onLoginSuccess }) {
         ) : (
           <form onSubmit={handleVerifyOTP} className="auth-form">
             <div className="input-group">
-              <label htmlFor="auth-otp">Terminal Verification OTP</label>
+              <label htmlFor="auth-otp">6-Digit Verification OTP</label>
               <input 
                 id="auth-otp"
                 type="text" 
@@ -210,6 +197,7 @@ export default function Login({ onLoginSuccess }) {
               setIsRegister(!isRegister); 
               setStep(1); 
               setErrorMessage(''); 
+              setSuccessMessage('');
             }}
           >
             {isRegister ? 'Already registered? Sign In' : "Don't have an account? Register"}

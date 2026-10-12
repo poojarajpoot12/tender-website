@@ -4,15 +4,19 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const initDailyCron = require('./cron/dailyAlerts');
+const authorityRoutes = require('./routes/authorityRoutes');
 
 dotenv.config();
 connectDB();
 
 const app = express();
 
+// CORS Middleware Configuration
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+
+// Increase payload limits to support Base64 image uploads (e.g., companyLogo)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 initDailyCron();
 
@@ -27,13 +31,17 @@ app.use('/api/usage', require('./routes/usage'));
 app.use('/api/bids', require('./routes/bidRoutes'));
 app.use('/api/alerts', require('./routes/alertRoutes'));
 app.use('/api/support', require('./routes/supportRoutes'));
+app.use('/api/authorities', require('./routes/authorityRoutes'));
 
+// HEALTH CHECK ROUTE
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'InfraLens Backend Server Running Smoothly' });
 });
 
+// 404 HANDLER FOR UNMATCHED ROUTES
 app.use((req, res) => res.status(404).json({ success: false, message: 'API Route Not Found' }));
 
+// GLOBAL ERROR HANDLING MIDDLEWARE
 app.use((err, req, res, next) => {
   console.error('❌ Server Error:', err.stack);
   res.status(err.status || 500).json({ success: false, message: err.message || 'Internal Server Error' });

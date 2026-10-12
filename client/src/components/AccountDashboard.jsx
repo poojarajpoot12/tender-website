@@ -4,6 +4,15 @@ import '../css/AccountDashboard.css';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
+const AVAILABLE_SPECIALIZATIONS = [
+  'Medical & Hospital Supplies',
+  'IT Infrastructure & Networking',
+  'Civil & Road Construction',
+  'Electrical & Solar Works',
+  'Facility & Security Management',
+  'Printing & Stationary'
+];
+
 const generateNameFromEmail = (email) => {
   if (!email) return 'User';
   const usernamePart = email.split('@')[0];
@@ -45,6 +54,10 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
     companyType: userData?.companyType || '',
     gstin: userData?.gstin || '',
     pan: userData?.pan || '',
+    companyLogo: userData?.companyLogo || '',
+    specializations: userData?.specializations || [],
+    locations: userData?.locations || [],
+    districtInput: '',
     whatsappAlertsEnabled: userData?.whatsappAlertsEnabled ?? true,
   });
 
@@ -62,8 +75,6 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
 
   const [isProfileSaved, setIsProfileSaved] = useState(false);
   const [saveLoading, setSaveLoading] = useState(false);
-
-  // Dynamic Saved Bids State
   const [savedBids, setSavedBids] = useState([]);
 
   const availableLocations = [
@@ -97,14 +108,18 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
 
   useEffect(() => {
     if (userData) {
-      setCompanyDetails({
-        mobileNumber: userData?.mobileNumber || '',
-        companyName: userData?.companyName || '',
-        companyType: userData?.companyType || '',
-        gstin: userData?.gstin || '',
-        pan: userData?.pan || '',
+      setCompanyDetails((prev) => ({
+        ...prev,
+        mobileNumber: userData?.mobileNumber || prev.mobileNumber || '',
+        companyName: userData?.companyName || prev.companyName || '',
+        companyType: userData?.companyType || prev.companyType || '',
+        gstin: userData?.gstin || prev.gstin || '',
+        pan: userData?.pan || prev.pan || '',
+        companyLogo: userData?.companyLogo || prev.companyLogo || '',
+        specializations: userData?.specializations || prev.specializations || [],
+        locations: userData?.locations || prev.locations || [],
         whatsappAlertsEnabled: userData?.whatsappAlertsEnabled ?? true,
-      });
+      }));
 
       if (userData?.alertPreferences) {
         setSelectedLocations(userData.alertPreferences.locations || ['Delhi', 'Karnataka']);
@@ -182,7 +197,7 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
   };
 
   const tabs = ['Plans', 'Profile', 'Usage', 'My Bids', 'Alerts', 'Support'];
-
+  
   const predefinedUsageMetrics = [
     { activity: 'Searches', quota: '250 / month', used: 7 },
     { activity: 'Tender and GeM Pages', quota: '150 / month', used: 14 },
@@ -193,6 +208,55 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
     { activity: 'Deep Dive Re-opens', quota: '10 / month', used: 1 },
     { activity: 'Company, Authority, Sector and GeM List Pages', quota: '10 / month', used: 10 },
   ];
+
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCompanyDetails((prev) => ({ ...prev, companyLogo: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSpecializationChange = (spec) => {
+    const currentSpecs = companyDetails.specializations || [];
+    if (currentSpecs.includes(spec)) {
+      setCompanyDetails({
+        ...companyDetails,
+        specializations: currentSpecs.filter((item) => item !== spec),
+      });
+    } else {
+      if (currentSpecs.length < 3) {
+        setCompanyDetails({
+          ...companyDetails,
+          specializations: [...currentSpecs, spec],
+        });
+      }
+    }
+  };
+
+  const handleAddDistrict = (e) => {
+    if (e.key && e.key !== 'Enter') return;
+    if (e.key === 'Enter') e.preventDefault();
+
+    const value = companyDetails.districtInput?.trim();
+    if (value && !companyDetails.locations?.includes(value)) {
+      setCompanyDetails({
+        ...companyDetails,
+        locations: [...(companyDetails.locations || []), value],
+        districtInput: '',
+      });
+    }
+  };
+
+  const handleRemoveDistrict = (dist) => {
+    setCompanyDetails({
+      ...companyDetails,
+      locations: companyDetails.locations.filter((item) => item !== dist),
+    });
+  };
 
   const handleCompanySubmit = async (e) => {
     e.preventDefault();
@@ -228,19 +292,24 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
     }
   };
 
+  /* ================= FIXED MOBILE OTP FUNCTIONS ================= */
   const handleSendMobileOtp = async () => {
     if (!companyDetails.mobileNumber) {
       alert('Please enter a mobile number first.');
       return;
     }
     try {
+      const targetEmail = userData?.email || '';
       const res = await fetch(`${API_BASE_URL}/api/auth/send-mobile-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ email: userData.email, mobileNumber: companyDetails.mobileNumber }),
+        body: JSON.stringify({
+          email: targetEmail,
+          mobileNumber: companyDetails.mobileNumber,
+        }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -250,7 +319,8 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
         alert(data.message || 'Failed to send OTP.');
       }
     } catch (err) {
-      alert('Error sending OTP');
+      console.error('Send OTP Error:', err);
+      alert('Error sending OTP. Please try again.');
     }
   };
 
@@ -260,27 +330,51 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
       return;
     }
     try {
+      const targetEmail = userData?.email || '';
       const res = await fetch(`${API_BASE_URL}/api/auth/verify-mobile-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({ email: userData.email, otp: mobileOtpInput }),
+        body: JSON.stringify({
+          email: targetEmail,
+          mobileNumber: companyDetails.mobileNumber,
+          otp: mobileOtpInput.trim(),
+        }),
       });
       const data = await res.json();
       if (res.ok) {
-        setUserData({ ...userData, isMobileVerified: true });
+        const updatedUser = {
+          ...userData,
+          isMobileVerified: true,
+          mobileNumber: companyDetails.mobileNumber,
+        };
+
+        setUserData(updatedUser);
+        setCompanyDetails((prev) => ({
+          ...prev,
+          mobileNumber: companyDetails.mobileNumber,
+        }));
         setShowOtpField(false);
         setMobileOtpInput('');
-        alert('Mobile Number Verified!');
+
+        if (localStorage.getItem('token')) {
+          localStorage.setItem('user', JSON.stringify(updatedUser));
+        } else {
+          sessionStorage.setItem('user', JSON.stringify(updatedUser));
+        }
+
+        alert('Mobile Number Verified Successfully!');
       } else {
         alert(data.message || 'Invalid OTP');
       }
     } catch (err) {
-      alert('Error verifying OTP');
+      console.error('Verify OTP Error:', err);
+      alert('Error verifying OTP. Please try again.');
     }
   };
+  /* =============================================================== */
 
   const toggleLocation = (loc) => {
     if (selectedLocations.includes(loc)) {
@@ -375,27 +469,14 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
               <div className="progress-fill" style={{ width: `${user.profileStrength}%` }}></div>
             </div>
             <p
-              className="strength-sub"
-              onClick={() => setActiveTab('Profile')}
-              onKeyDown={(e) => e.key === 'Enter' && setActiveTab('Profile')}
-              role="button"
-              tabIndex={0}
-            >
-              Complete profile to double usage →
-            </p>
+              className="strength-sub" onClick={() => setActiveTab('Profile')} onKeyDown={(e) => e.key === 'Enter' && setActiveTab('Profile')} role="button" tabIndex={0}> Complete profile to double usage → </p>
           </div>
         </div>
 
         {/* DASHBOARD TABS */}
         <div className="dashboard-tabs">
           {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab}
-            </button>
+            <button key={tab} className={`tab-btn ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}> {tab}</button>
           ))}
         </div>
 
@@ -454,94 +535,123 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
                 <div className="card-header">
                   <div>
                     <h3>Company & Contact Details</h3>
-                    <span className="sub-muted">Used to send WhatsApp alerts and match eligible tenders.</span>
+                    <span className="sub-muted">Used to send WhatsApp alerts, display on Bidder Page, and match eligible tenders.</span>
                   </div>
                 </div>
                 <form onSubmit={handleCompanySubmit} className="profile-form">
+                  {/* WhatsApp Mobile Number */}
                   <div>
                     <div className="form-label-row">
                       <label className="form-label">WhatsApp Mobile Number</label>
-                      {user.isMobileVerified ? (
+                      {user?.isMobileVerified ? (
                         <span className="badge badge-verified">VERIFIED</span>
                       ) : (
-                        <button
-                          type="button"
-                          onClick={handleSendMobileOtp}
-                          className="btn-otp-link"
-                        >
-                          Verify via OTP
-                        </button>
+                        <button type="button" onClick={handleSendMobileOtp} className="btn-otp-link"> Verify via OTP</button>
                       )}
                     </div>
-                    <input
-                      type="text"
-                      placeholder="e.g. 9876543210"
-                      className="dashboard-input input-with-margin"
-                      value={companyDetails.mobileNumber}
-                      onChange={(e) => setCompanyDetails({ ...companyDetails, mobileNumber: e.target.value })}
-                      required
-                    />
+                    <input type="text" placeholder="e.g. 9876543210" className="dashboard-input input-with-margin" value={companyDetails.mobileNumber} onChange={(e) => setCompanyDetails({ ...companyDetails, mobileNumber: e.target.value })} required />
                   </div>
 
                   {showOtpField && (
                     <div className="otp-box">
                       <p className="otp-msg">{otpSentMsg}</p>
                       <div className="otp-input-group">
-                        <input
-                          type="text"
-                          placeholder="Enter 6-digit OTP"
-                          className="dashboard-input"
-                          value={mobileOtpInput}
-                          onChange={(e) => setMobileOtpInput(e.target.value)}
-                        />
-                        <button type="button" onClick={handleVerifyMobileOtp} className="btn-verify-mobile">
-                          Verify
-                        </button>
+                        <input type="text" placeholder="Enter 6-digit OTP" className="dashboard-input" value={mobileOtpInput} onChange={(e) => setMobileOtpInput(e.target.value)}/>
+                        <button type="button" onClick={handleVerifyMobileOtp} className="btn-verify-mobile"> Verify </button>
                       </div>
                     </div>
                   )}
 
+                  {/* Company Name */}
                   <div>
                     <label className="form-label">Company Name</label>
-                    <input
-                      type="text"
-                      placeholder="Company name"
-                      className="dashboard-input input-with-margin"
-                      value={companyDetails.companyName}
-                      onChange={(e) => setCompanyDetails({ ...companyDetails, companyName: e.target.value })}
-                    />
+                    <input type="text" placeholder="Company name" className="dashboard-input input-with-margin" value={companyDetails.companyName} onChange={(e) => setCompanyDetails({ ...companyDetails, companyName: e.target.value })}/>
                   </div>
 
+                  {/* Company Logo */}
+                  <div>
+                    <label className="form-label">Company Logo</label>
+                    <div className="logo-upload-wrapper">
+                      <div className="logo-preview-box">
+                        {companyDetails.companyLogo ? (
+                          <img src={companyDetails.companyLogo} alt="Logo Preview" className="logo-preview-img" />
+                        ) : (
+                          <span className="logo-fallback-text">No Logo</span>
+                        )}
+                      </div>
+                      <input type="file" accept="image/*" onChange={handleLogoUpload} className="dashboard-input logo-file-input"/>
+                    </div>
+                  </div>
+
+                  {/* Specializations Checklist (Max 3) */}
+                  <div>
+                    <div className="specialization-header">
+                      <label className="form-label">Company Specialization</label>
+                      <span className="sub-muted specialization-count">
+                        ({companyDetails.specializations?.length || 0}/3 Selected)
+                      </span>
+                    </div>
+                    <div className="specialization-checklist-grid">
+                      {AVAILABLE_SPECIALIZATIONS.map((spec) => {
+                        const isChecked = companyDetails.specializations?.includes(spec);
+                        return (
+                          <label key={spec} className={`specialization-checkbox-label ${isChecked ? 'selected' : ''}`}>
+                            <input type="checkbox" checked={isChecked} onChange={() => handleSpecializationChange(spec)} disabled={!isChecked && (companyDetails.specializations?.length || 0) >= 3}/>
+                            {spec}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Operating District / Locations */}
+                  <div>
+                    <label className="form-label">Operating Locations (District Wise)</label>
+                    <div className="district-input-row">
+                      <input type="text" placeholder="Enter district name (e.g. Lucknow, Gautam Buddha Nagar)" className="dashboard-input" value={companyDetails.districtInput || ''} onChange={(e) => setCompanyDetails({ ...companyDetails, districtInput: e.target.value })} onKeyDown={handleAddDistrict}
+                      />
+                      <button
+                        type="button" onClick={handleAddDistrict} className="btn-verify-mobile btn-add-district"
+                      >
+                        + Add
+                      </button>
+                    </div>
+
+                    {/* Added District Badges Container */}
+                    <div className="district-tags-container">
+                      {companyDetails.locations?.length > 0 ? (
+                        companyDetails.locations.map((dist, idx) => (
+                          <span key={idx} className="district-tag-badge">
+                            📍 {dist}
+                            <button
+                              type="button" onClick={() => handleRemoveDistrict(dist)} className="btn-remove-district"> ×</button>
+                          </span>
+                        ))
+                      ) : (
+                        <span className="sub-muted no-district-msg">No districts added yet.</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Company Type */}
                   <div>
                     <label className="form-label">Company Type</label>
                     <input
-                      type="text"
-                      placeholder="e.g. Private Limited, Proprietorship"
-                      className="dashboard-input input-with-margin"
-                      value={companyDetails.companyType}
-                      onChange={(e) => setCompanyDetails({ ...companyDetails, companyType: e.target.value })}
+                      type="text" placeholder="e.g. Private Limited, Proprietorship" className="dashboard-input input-with-margin" value={companyDetails.companyType} onChange={(e) => setCompanyDetails({ ...companyDetails, companyType: e.target.value })}
                     />
                   </div>
 
+                  {/* GSTIN */}
                   <div>
                     <label className="form-label">GSTIN</label>
-                    <input
-                      type="text"
-                      placeholder="GSTIN"
-                      className="dashboard-input input-with-margin"
-                      value={companyDetails.gstin}
-                      onChange={(e) => setCompanyDetails({ ...companyDetails, gstin: e.target.value })}
+                    <input type="text" placeholder="GSTIN" className="dashboard-input input-with-margin"value={companyDetails.gstin} onChange={(e) => setCompanyDetails({ ...companyDetails, gstin: e.target.value })}
                     />
                   </div>
 
+                  {/* PAN */}
                   <div>
                     <label className="form-label">PAN</label>
-                    <input
-                      type="text"
-                      placeholder="PAN"
-                      className="dashboard-input input-with-margin"
-                      value={companyDetails.pan}
-                      onChange={(e) => setCompanyDetails({ ...companyDetails, pan: e.target.value })}
+                    <input type="text" placeholder="PAN" className="dashboard-input input-with-margin" value={companyDetails.pan} onChange={(e) => setCompanyDetails({ ...companyDetails, pan: e.target.value })}
                     />
                   </div>
 
@@ -586,14 +696,48 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
             </div>
 
             <div className="profile-section-column">
+              {/* PROFILE CHECKLIST */}
               <div className="content-card">
                 <h3>PROFILE CHECKLIST</h3>
                 <ul className="promo-features checklist-list">
                   <li><span className="check-icon">✓</span> Sign in with email</li>
-                  <li><span className={userData?.mobileNumber ? 'check-active' : 'check-inactive'}>{userData?.mobileNumber ? '✓' : '○'}</span> Add WhatsApp Mobile Number</li>
-                  <li><span className={userData?.companyName ? 'check-active' : 'check-inactive'}>{userData?.companyName ? '✓' : '○'}</span> Add Company Details</li>
+                  <li>
+                    <span className={userData?.mobileNumber ? 'check-active' : 'check-inactive'}>
+                      {userData?.mobileNumber ? '✓' : '○'}
+                    </span>{' '}
+                    Add WhatsApp Mobile Number
+                  </li>
+                  <li>
+                    <span className={userData?.companyName ? 'check-active' : 'check-inactive'}>
+                      {userData?.companyName ? '✓' : '○'}
+                    </span>{' '}
+                    Add Company Details
+                  </li>
+                  <li>
+                    <span className={companyDetails.companyLogo ? 'check-active' : 'check-inactive'}>
+                      {companyDetails.companyLogo ? '✓' : '○'}
+                    </span>{' '}
+                    Upload Company Logo
+                  </li>
+                  <li>
+                    <span className={(companyDetails.specializations?.length || 0) > 0 ? 'check-active' : 'check-inactive'}>
+                      {(companyDetails.specializations?.length || 0) > 0 ? '✓' : '○'}
+                    </span>{' '}
+                    Add Specializations (Max 3)
+                  </li>
+                  <li>
+                    <span className={(companyDetails.locations?.length || 0) > 0 ? 'check-active' : 'check-inactive'}>
+                      {(companyDetails.locations?.length || 0) > 0 ? '✓' : '○'}
+                    </span>{' '}
+                    Add Operating Districts
+                  </li>
                   <li><span className="check-icon">✓</span> Set up WhatsApp alerts</li>
-                  <li><span className={savedBids.length > 0 ? 'check-active' : 'check-inactive'}>{savedBids.length > 0 ? '✓' : '○'}</span> Save your first bid</li>
+                  <li>
+                    <span className={savedBids?.length > 0 ? 'check-active' : 'check-inactive'}>
+                      {savedBids?.length > 0 ? '✓' : '○'}
+                    </span>{' '}
+                    Save your first bid
+                  </li>
                 </ul>
               </div>
 
@@ -707,14 +851,7 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
                   return (
                     <div 
                       key={itemId} 
-                      style={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        alignItems: 'center', 
-                        padding: '12px 16px', 
-                        border: '1px solid #E5E7EB', 
-                        borderRadius: '8px',
-                        backgroundColor: '#FFFFFF'
+                      style={{  display: 'flex', justifyContent: 'space-between',  alignItems: 'center',  padding: '12px 16px', border: '1px solid #E5E7EB',  borderRadius: '8px', backgroundColor: '#FFFFFF'
                       }}
                     >
                       <div>
@@ -728,14 +865,7 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
                       <button 
                         type="button"
                         onClick={() => handleRemoveSavedBid(itemId)}
-                        style={{
-                          backgroundColor: '#FEE2E2',
-                          color: '#EF4444',
-                          border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          fontWeight: '500'
+                        style={{backgroundColor: '#FEE2E2',color: '#EF4444', border: 'none', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer',fontWeight: '500'
                         }}
                       >
                         Remove
@@ -763,21 +893,10 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
                   const isSelected = selectedLocations.includes(loc);
                   return (
                     <button
-                      key={loc}
-                      type="button"
-                      onClick={() => toggleLocation(loc)}
-                      style={{
-                        padding: '6px 14px',
-                        borderRadius: '20px',
-                        border: isSelected ? '1px solid #2563EB' : '1px solid #D1D5DB',
-                        backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF',
-                        color: isSelected ? '#2563EB' : '#374151',
-                        cursor: 'pointer',
-                        fontWeight: isSelected ? '600' : '400',
+                      key={loc} type="button" onClick={() => toggleLocation(loc)} style={{ padding: '6px 14px', borderRadius: '20px', border: isSelected ? '1px solid #2563EB' : '1px solid #D1D5DB', backgroundColor: isSelected ? '#EFF6FF' : '#FFFFFF', color: isSelected ? '#2563EB' : '#374151', cursor: 'pointer',  fontWeight: isSelected ? '600' : '400',
                       }}
                     >
-                      {isSelected ? '✓ ' : '+ '}{loc}
-                    </button>
+                      {isSelected ? '✓ ' : '+ '}{loc}</button>
                   );
                 })}
               </div>
@@ -786,50 +905,30 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
                 Alert Keywords
               </label>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <input
-                  type="text"
-                  placeholder="e.g. Solar Panel, Laptops..."
-                  className="dashboard-input"
-                  value={newKeywordInput}
+                <input type="text"  placeholder="e.g. Solar Panel, Laptops..." className="dashboard-input" value={newKeywordInput}
                   onChange={(e) => setNewKeywordInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddKeyword())}
                 />
-                <button type="button" onClick={handleAddKeyword} className="btn-verify-mobile">
-                  Add
-                </button>
+                <button type="button" onClick={handleAddKeyword} className="btn-verify-mobile"> Add </button>
               </div>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
                 {selectedKeywords.map((kw) => (
                   <span
                     key={kw}
-                    style={{
-                      backgroundColor: '#F3F4F6',
-                      padding: '4px 12px',
-                      borderRadius: '16px',
-                      fontSize: '0.9rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
+                    style={{ backgroundColor: '#F3F4F6', padding: '4px 12px', borderRadius: '16px', fontSize: '0.9rem', display: 'flex',alignItems: 'center', gap: '6px',
                     }}
                   >
                     {kw}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveKeyword(kw)}
-                      style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', fontWeight: 'bold' }}
-                    >
-                      ×
-                    </button>
+                    <button type="button" onClick={() => handleRemoveKeyword(kw)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#EF4444', fontWeight: 'bold' }}>
+                      ×</button>
                   </span>
                 ))}
               </div>
 
               {prefSaveStatus && <p style={{ color: '#059669', marginBottom: '12px' }}>{prefSaveStatus}</p>}
 
-              <button type="button" onClick={handleSavePreferences} className="btn-verify-mobile">
-                Save Preferences
-              </button>
+              <button type="button" onClick={handleSavePreferences} className="btn-verify-mobile"> Save Preferences </button>
             </div>
           </div>
         )}
@@ -844,13 +943,7 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
               <div>
                 <label className="form-label">How can we help you?</label>
                 <textarea
-                  rows="4"
-                  className="dashboard-input"
-                  placeholder="Describe your issue or feedback..."
-                  value={supportMessage}
-                  onChange={(e) => setSupportMessage(e.target.value)}
-                  required
-                  style={{ width: '100%', padding: '10px', marginTop: '6px', resize: 'vertical' }}
+                  rows="4" className="dashboard-input" placeholder="Describe your issue or feedback..." value={supportMessage} onChange={(e) => setSupportMessage(e.target.value)} required style={{ width: '100%', padding: '10px', marginTop: '6px', resize: 'vertical' }}
                 ></textarea>
               </div>
 

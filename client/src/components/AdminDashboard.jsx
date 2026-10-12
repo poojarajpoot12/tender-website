@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AdminBulkUpload from './AdminBulkUpload';
 import '../css/AdminDashboard.css';
 
@@ -9,6 +10,9 @@ export default function AdminDashboard() {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [editingTender, setEditingTender] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Mobile drawer state
+
+  const navigate = useNavigate(); // Navigation hook for Home/Logout
 
   // Backend se Tenders Fetch karein
   const fetchTenders = async () => {
@@ -106,10 +110,28 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleNavClick = (tab) => {
+    setActiveTab(tab);
+    setIsSidebarOpen(false); // Mobile me tab click krte hi sidebar close ho jaye
+  };
+
   return (
     <div className="admin-dashboard-container">
+      {/* Mobile Top Header (Sirf Mobile ke liye) */}
+      <div className="mobile-top-bar">
+        <button className="hamburger-btn" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          ☰
+        </button>
+        <div className="mobile-brand">
+          <span>🛡️</span> <h2>Admin Portal</h2>
+        </div>
+      </div>
+
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && <div className="sidebar-overlay" onClick={() => setIsSidebarOpen(false)}></div>}
+
       {/* Sidebar */}
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
           <div className="brand-icon">🛡️</div>
           <div>
@@ -121,24 +143,35 @@ export default function AdminDashboard() {
         <nav className="sidebar-menu">
           <button
             className={`menu-btn ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
+            onClick={() => handleNavClick('overview')}
           >
             <span className="icon">📊</span> Overview & Stats
           </button>
           <button
             className={`menu-btn ${activeTab === 'bulk-upload' ? 'active' : ''}`}
-            onClick={() => setActiveTab('bulk-upload')}
+            onClick={() => handleNavClick('bulk-upload')}
           >
             <span className="icon">📁</span> Bulk Data Ingestion
           </button>
           <button
             className={`menu-btn ${activeTab === 'manage' ? 'active' : ''}`}
-            onClick={() => setActiveTab('manage')}
+            onClick={() => handleNavClick('manage')}
           >
             <span className="icon">📋</span> Manage All Tenders
             <span className="badge">{tenders.length}</span>
           </button>
         </nav>
+
+        {/* Sidebar Footer Navigation (Home & Logout) */}
+        <div className="sidebar-footer">
+          <hr className="sidebar-divider" />
+          <button className="menu-btn nav-link-btn" onClick={() => navigate('/')}>
+            <span className="icon">🏠</span> Home Page
+          </button>
+          <button className="menu-btn nav-link-btn logout-btn" onClick={() => navigate('/login')}>
+            <span className="icon">🚪</span> Logout
+          </button>
+        </div>
       </aside>
 
       {/* Main Content */}

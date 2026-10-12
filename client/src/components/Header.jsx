@@ -46,7 +46,7 @@ export default function Header({ user, onLogout }) {
           <Link to="/results" className="nav-item" onClick={closeMenu}>
             Results
           </Link>
-          <Link to="/companies" className="nav-item" onClick={closeMenu}>
+          <Link to="/bidders" className="nav-item" onClick={closeMenu}>
             Companies
           </Link>
           <Link to="/authorities" className="nav-item" onClick={closeMenu}>

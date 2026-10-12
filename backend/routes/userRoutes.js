@@ -2,8 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const { getUserProfile, updateUserProfile } = require('../controllers/userController');
-const { protect } = require('../middleware/authMiddleware'); // Fixed spelling 'middlewere' -> 'middleware'
+const { protect } = require('../middleware/authMiddleware');
 
+// Profile routes with authentication middleware
 router.get('/profile', protect, getUserProfile);
 router.put('/profile', protect, updateUserProfile);
 

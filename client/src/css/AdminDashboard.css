@@ -4,6 +4,43 @@
   min-height: 100vh;
   background-color: #f1f5f9;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+}
+
+/* Mobile Top Navbar */
+.mobile-top-bar {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #0f172a;
+  color: white;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 100;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobile-brand h2 {
+  font-size: 1.1rem;
+  margin: 0;
 }
 
 /* Sidebar */
@@ -15,6 +52,19 @@
   display: flex;
   flex-direction: column;
   box-shadow: 4px 0 10px rgba(0,0,0,0.05);
+  transition: transform 0.3s ease-in-out;
+  z-index: 102;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 101;
 }
 
 .sidebar-brand {
@@ -84,11 +134,38 @@
   font-size: 0.75rem;
 }
 
+/* Sidebar Bottom Footer Links (Home & Logout) */
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.sidebar-divider {
+  border: 0;
+  border-top: 1px solid #334155;
+  margin-bottom: 16px;
+}
+
+.nav-link-btn {
+  color: #cbd5e1;
+}
+
+.nav-link-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.logout-btn:hover {
+  background-color: #ef4444 !important;
+  color: #ffffff;
+}
+
 /* Main Content */
 .admin-main-content {
   flex: 1;
   padding: 40px;
   overflow-y: auto;
+  width: 100%;
 }
 
 .fade-in {
@@ -122,7 +199,7 @@
 }
 
 /* Search Box */
-.search-boxadmin {
+.search-box {
   display: flex;
   align-items: center;
   background: #ffffff;
@@ -130,15 +207,17 @@
   padding: 10px 16px;
   border-radius: 10px;
   width: 320px;
+  max-width: 100%;
   box-shadow: 0 2px 5px rgba(0,0,0,0.02);
 }
 
-.search-boxadmin input {
+.search-box input {
   border: none;
   outline: none;
   width: 100%;
   margin-left: 8px;
   font-size: 0.9rem;
+  background: transparent;
 }
 
 /* Stats Grid */
@@ -185,23 +264,50 @@
   font-weight: 600;
 }
 
-/* Table */
+/* Table Container & Scroll Settings */
 .admin-table-wrapper {
   background: #ffffff;
   border-radius: 16px;
   border: 1px solid #e2e8f0;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  max-height: 480px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+}
+
+/* Custom Green Scrollbar */
+.admin-table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.admin-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 8px;
+}
+
+.admin-table-wrapper::-webkit-scrollbar-thumb {
+  background: #10b981;
+  border-radius: 8px;
+}
+
+.admin-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #059669;
 }
 
 .admin-data-table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 700px;
 }
 
 .admin-data-table th {
+  position: sticky;
+  top: 0;
   background-color: #f8fafc;
+  z-index: 2;
   padding: 16px 20px;
   color: #475569;
   font-weight: 700;
@@ -303,6 +409,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 16px;
 }
 
 .modal-content {
@@ -312,6 +419,8 @@
   max-width: 500px;
   padding: 24px;
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -356,6 +465,7 @@
   border-radius: 8px;
   outline: none;
   font-size: 0.95rem;
+  width: 100%;
 }
 
 .edit-form input:focus {
@@ -394,54 +504,59 @@
   cursor: pointer;
   font-weight: 600;
 }
-.admin-table-wrapper {
-  background: #ffffff;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-  
-  /* Sirf Table Box me Scroll Settings */
-  max-height: 480px; /* Is height ke baad andar scroller ban jayega */
-  overflow-y: auto;  /* Vertical scroll enable */
-  position: relative;
+
+/* ================= RESPONSIVE MEDIA QUERIES ================= */
+
+@media (max-width: 1024px) {
+  .admin-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100vh;
+    transition: left 0.3s ease;
+  }
+
+  .admin-sidebar.open {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .admin-sidebar.open ~ .sidebar-overlay, 
+  .admin-dashboard-container:has(.admin-sidebar.open) .sidebar-overlay {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .mobile-top-bar {
+    display: flex;
+  }
+
+  .admin-main-content {
+    padding: 80px 20px 20px 20px;
+  }
 }
 
-/* Custom Green Scrollbar (Sirf Table Container Ke Liye) */
-.admin-table-wrapper::-webkit-scrollbar {
-  width: 8px;
-}
+@media (max-width: 768px) {
+  .flex-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.admin-table-wrapper::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 8px;
-}
+  .search-box {
+    width: 100%;
+  }
 
-.admin-table-wrapper::-webkit-scrollbar-thumb {
-  background: #10b981; /* Green Thumb */
-  border-radius: 8px;
-}
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 
-.admin-table-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #059669;
-}
-
-/* Table Header Sticky (Taaki scroll krte time headers upar fix rahein) */
-.admin-data-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
-
-.admin-data-table th {
-  position: sticky;
-  top: 0;
-  background-color: #f8fafc;
-  z-index: 2;
-  padding: 16px 20px;
-  color: #475569;
-  font-weight: 700;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid #e2e8f0;
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -1,0 +1,233 @@
+.dept-page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #0f172a;
+}
+
+/* Hero Header */
+.dept-hero-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.dept-hero-top {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.dept-logo-badge {
+  width: 72px;
+  height: 72px;
+  background: #0d9488;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+}
+
+.dept-tags {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.35rem;
+}
+
+.sector-tag { background: #ccfbf1; color: #0f766e; }
+.category-tag { background: #f1f5f9; color: #475569; }
+
+.dept-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0 0 0.4rem 0;
+  color: #0f172a;
+}
+
+.dept-sub-info {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  font-size: 0.88rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.dept-link {
+  color: #0d9488;
+  text-decoration: none;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.dept-desc {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+/* KPI Grid */
+.dept-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.kpi-box {
+  background: #f8fafc;
+  padding: 1rem 1.25rem;
+  border-radius: 0.65rem;
+  border: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-box.highlight-box {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.kpi-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+}
+
+.kpi-num {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 0.2rem;
+}
+
+.value-green { color: #0d9488; }
+
+/* Tabs Bar */
+.dept-tabs-bar {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.75rem 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.tab-btn.active {
+  color: #0d9488;
+  border-bottom-color: #0d9488;
+}
+
+/* Content & Tender Cards */
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.5rem;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  font-size: 0.88rem;
+  width: 220px;
+}
+
+.dept-tender-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+}
+
+.dept-tender-card:hover {
+  border-color: #0d9488;
+}
+
+.tender-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.ref-id { font-size: 0.8rem; color: #64748b; font-weight: 600; }
+.due-badge { font-size: 0.8rem; color: #be123c; font-weight: 700; display: flex; align-items: center; gap: 0.25rem; }
+
+.tender-name { font-size: 1.1rem; font-weight: 700; margin: 0 0 1rem 0; }
+
+.tender-meta {
+  display: flex;
+  gap: 2rem;
+  background: #f8fafc;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.green-text { color: #0d9488; font-weight: 700; }
+
+.btn-view {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-view:hover { background: #0d9488; }
+
+.empty-tab-state {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px dashed #cbd5e1;
+}

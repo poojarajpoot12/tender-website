@@ -1,83 +1,41 @@
-// models/User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  // Basic Account Credentials
-  email: { 
-    type: String, 
-    required: true, 
-    unique: true, 
-    lowercase: true, 
-    trim: true 
-  },
-  password: { 
-    type: String, 
-    required: true 
-  },
-  name: { 
-    type: String, 
-    default: '' 
-  },
-  companyName: { 
-    type: String, 
-    default: '' 
-  },
+  // Basic Auth Fields
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  password: { type: String, required: true },
+  otp: { type: String, default: null },
+  otpExpires: { type: Date, default: null },
+  isVerified: { type: Boolean, default: false },
 
-  // Business & Identity Info (NEW FIELDS ADDED)
-  companyType: { 
-    type: String, 
-    default: '' 
-  },
-  gstin: { 
-    type: String, 
-    default: '' 
-  },
-  panNumber: { 
-    type: String, 
-    default: '' 
-  },
+  // Mobile Verification Fields
+  mobileNumber: { type: String, default: '' },
+  mobileOtp: { type: String, default: null },
+  mobileOtpExpires: { type: Date, default: null },
+  isMobileVerified: { type: Boolean, default: false },
 
-  // Email OTP & Verification Status
-  isVerified: { 
-    type: Boolean, 
-    default: false 
-  },
-  otp: { 
-    type: String, 
-    default: null 
-  },
-  otpExpires: { 
-    type: Date, 
-    default: null 
-  },
-
-  // Mobile & WhatsApp Verification
-  mobileNumber: { 
-    type: String, 
-    default: '' 
-  },
-  isMobileVerified: { 
-    type: Boolean, 
-    default: false 
-  },
-  whatsappAlertsEnabled: { 
-    type: Boolean, 
-    default: true 
-  },
-  mobileOtp: { 
-    type: String, 
-    default: null 
-  },
-  mobileOtpExpires: { 
-    type: Date, 
-    default: null 
-  },
+  // Profile & Company Details (Matching AccountDashboard Frontend)
+  name: { type: String, default: '' },
+  companyName: { type: String, default: '' },
+  companyType: { type: String, default: '' },
+  gstin: { type: String, default: '' },
+  pan: { type: String, default: '' },
+  companyLogo: { type: String, default: '' }, // Base64 or Image URL
+  specializations: [{ type: String }],
+  locations: [{ type: String }], // Operating Districts / Locations
 
   // Alert Preferences
   alertPreferences: {
     locations: [{ type: String }],
-    keywords: [{ type: String }],
-  }
+    keywords: [{ type: String }]
+  },
+  whatsappAlertsEnabled: { type: Boolean, default: true },
+
+  // Dashboard Stats & Profile Strength
+  profileStrength: { type: Number, default: 20 },
+  totalTenders: { type: Number, default: 0 },
+  wonTenders: { type: Number, default: 0 },
+  wonValue: { type: Number, default: 0 }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
