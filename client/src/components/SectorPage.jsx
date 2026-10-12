@@ -2,6 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/SectorPage.css';
 
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
+
 export default function SectorPage() {
   const navigate = useNavigate();
   const [currentLevel, setCurrentLevel] = useState(1);
@@ -327,12 +332,12 @@ export default function SectorPage() {
     }
   ];
 
-  // Updated Fetch Function passing sector title & subcategory name
+  // Updated Fetch Function passing sector title & subcategory name with dynamic base URL
   const fetchCategoryTenders = async (sectorTitle, subCatName) => {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:5000/api/tenders/search?category=${encodeURIComponent(sectorTitle)}&subCategory=${encodeURIComponent(subCatName)}`
+        `${API_BASE_URL}/api/tenders/search?category=${encodeURIComponent(sectorTitle)}&subCategory=${encodeURIComponent(subCatName)}`
       );
       const result = await res.json();
       if (result.success) {
@@ -446,7 +451,8 @@ export default function SectorPage() {
 
                         <h3 className="tender-card-title">{item.title}</h3>
                         <p className="tender-dept">
-                          {item.department} • <strong style={{ color: '#334155' }}>{item.location?.state}</strong>
+                          {item.department}
+                          <strong style={{ color: '#334155' }}>{item.location?.state}</strong>
                         </p>
 
                         {/* Bidder Card */}

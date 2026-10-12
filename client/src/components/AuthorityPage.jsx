@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import '../css/AuthorityPage.css';
 
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
+
 const AuthorityPage = () => {
   // Data States
   const [heroStats, setHeroStats] = useState({});
@@ -39,7 +44,7 @@ const AuthorityPage = () => {
 
   const fetchMetaStats = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/authorities/meta-stats');
+      const res = await axios.get(`${API_BASE_URL}/api/authorities/meta-stats`);
       if (res.data.success) {
         setHeroStats(res.data.heroStats);
         setSectors(res.data.sectors || []);
@@ -62,7 +67,7 @@ const AuthorityPage = () => {
         sort: selectedSort,
         search: searchQuery
       };
-      const res = await axios.get('http://localhost:5000/api/authorities', { params });
+      const res = await axios.get(`${API_BASE_URL}/api/authorities`, { params });
       if (res.data.success) {
         setAuthorities(res.data.data);
         setTotalPages(res.data.totalPages);
@@ -80,7 +85,7 @@ const AuthorityPage = () => {
     setSelectedAuthority(authority);
     setModalLoading(true);
     try {
-      const res = await axios.get(`http://localhost:5000/api/authorities/${authority._id}/details`);
+      const res = await axios.get(`${API_BASE_URL}/api/authorities/${authority._id}/details`);
       if (res.data.success) {
         setAuthorityDetails(res.data.data);
       }

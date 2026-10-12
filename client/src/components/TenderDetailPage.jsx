@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Heart, Calendar, MapPin, Building, FileText, Download, Share2, ShieldCheck, DollarSign } from 'lucide-react';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
 
 export default function TenderDetailPage() {
   const { id } = useParams();

@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import AdminBulkUpload from './AdminBulkUpload';
 import '../css/AdminDashboard.css';
 
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'bulk-upload' | 'manage'
   const [tenders, setTenders] = useState([]);
@@ -19,7 +24,7 @@ export default function AdminDashboard() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('http://localhost:5000/api/admin/tenders');
+      const res = await fetch(`${API_BASE_URL}/api/admin/tenders`);
       const result = await res.json();
       if (result.success) {
         setTenders(result.data || []);
@@ -54,7 +59,7 @@ export default function AdminDashboard() {
     if (!window.confirm('Kya aap is tender ko delete karna chahte hain?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/tenders/${mongoId}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/tenders/${mongoId}`, {
         method: 'DELETE',
       });
       const data = await res.json();
@@ -91,7 +96,7 @@ export default function AdminDashboard() {
     e.preventDefault();
 
     try {
-      const res = await fetch(`http://localhost:5000/api/admin/tenders/${editingTender._id}`, {
+      const res = await fetch(`${API_BASE_URL}/api/admin/tenders/${editingTender._id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingTender),

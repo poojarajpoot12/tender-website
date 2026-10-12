@@ -110,7 +110,7 @@ const DepartmentPage = () => {
           <div className="live-bids-container">
             <div className="content-header">
               <h2>Open Tenders & RFPs</h2>
-              <div className="search-box">
+              <div className="search-box-dep">
                 <Search size={16} />
                 <input type="text" placeholder="Search tenders of this department..." />
               </div>

@@ -194,7 +194,7 @@ export default function Home({ tenders = [] }) {
             Comprehensive market analytics tracking over ₹6,0,0,000 Cr across 24 key industries.
           </p>
 
-          <form className="search-box" onSubmit={handleSearchSubmit}>
+          <form className="search-box-home" onSubmit={handleSearchSubmit}>
             <div className="input-group main-input">
               <span className="input-icon">🔍</span>
               <input
@@ -202,7 +202,7 @@ export default function Home({ tenders = [] }) {
                 placeholder="Search by Keyword, Tender ID, or Authority..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
+                className="search-input-home"
               />
             </div>
 

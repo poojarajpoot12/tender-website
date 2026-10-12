@@ -2,6 +2,11 @@ import React, { useEffect, useState } from 'react';
 import BidderCard from './BidderCard';
 import '../css/BidderPage.css';
 
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
+
 const BidderPage = () => {
   const [bidders, setBidders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,8 +19,8 @@ const BidderPage = () => {
         setLoading(true);
         setApiError(null);
 
-        // Standard API Endpoint
-        const apiUrl = 'http://localhost:5000/api/bids/bidders';
+        // Standard Dynamic API Endpoint
+        const apiUrl = `${API_BASE_URL}/api/bids/bidders`;
         console.log('📡 Hitting API Endpoint:', apiUrl);
 
         const response = await fetch(apiUrl);
@@ -83,7 +88,7 @@ const BidderPage = () => {
       {/* Show Error banner if API fails */}
       {apiError && (
         <div style={{ color: 'red', background: '#fee2e2', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>
-          <strong>API Error:</strong> {apiError}. Make sure node backend server is running on port 5000!
+          <strong>API Error:</strong> {apiError}. Make sure node backend server is running or check live connection!
         </div>
       )}
 

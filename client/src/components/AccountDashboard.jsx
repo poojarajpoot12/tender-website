@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../css/AccountDashboard.css';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
 
 const AVAILABLE_SPECIALIZATIONS = [
   'Medical & Hospital Supplies',
@@ -292,7 +295,6 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
     }
   };
 
-  /* ================= FIXED MOBILE OTP FUNCTIONS ================= */
   const handleSendMobileOtp = async () => {
     if (!companyDetails.mobileNumber) {
       alert('Please enter a mobile number first.');
@@ -374,7 +376,6 @@ const AccountDashboard = ({ user: propUser, onLogout }) => {
       alert('Error verifying OTP. Please try again.');
     }
   };
-  /* =============================================================== */
 
   const toggleLocation = (loc) => {
     if (selectedLocations.includes(loc)) {

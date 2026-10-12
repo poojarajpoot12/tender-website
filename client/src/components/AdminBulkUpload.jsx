@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import '../css/AdminBulkUpload.css';
 
+// Dynamic API Base URL (Local aur Live dono ke liye)
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : 'https://tender-website-r77f.onrender.com';
+
 export default function AdminBulkUpload() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [sheetId, setSheetId] = useState('');
@@ -19,7 +24,7 @@ export default function AdminBulkUpload() {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/admin/upload-excel', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/upload-excel`, {
         method: 'POST',
         body: formData,
       });
@@ -42,7 +47,7 @@ export default function AdminBulkUpload() {
     setMessage('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/admin/sync-google-sheet', {
+      const res = await fetch(`${API_BASE_URL}/api/admin/sync-google-sheet`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sheetId: sheetId.trim() }),
