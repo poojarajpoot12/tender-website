@@ -1,3 +1,4 @@
+// backend/models/User.js
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -14,15 +15,15 @@ const userSchema = new mongoose.Schema({
   mobileOtpExpires: { type: Date, default: null },
   isMobileVerified: { type: Boolean, default: false },
 
-  // Profile & Company Details (Matching AccountDashboard Frontend)
+  // Profile & Company Details
   name: { type: String, default: '' },
   companyName: { type: String, default: '' },
   companyType: { type: String, default: '' },
   gstin: { type: String, default: '' },
   pan: { type: String, default: '' },
-  companyLogo: { type: String, default: '' }, // Base64 or Image URL
+  companyLogo: { type: String, default: '' },
   specializations: [{ type: String }],
-  locations: [{ type: String }], // Operating Districts / Locations
+  locations: [{ type: String }],
 
   // Alert Preferences
   alertPreferences: {

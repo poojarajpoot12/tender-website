@@ -5,46 +5,55 @@ const Tender = require('./models/Tender');
 
 const sampleTenders = [
   {
-    tenderId: "TEN-2026-001",
+    tenderNumber: "TEN-2026-001",
+    tenderID: "TID-901",
     title: "Construction of 4-Lane Highway in Rohini",
-    description: "Road expansion and asphalt carpeting work including drainage setup.",
-    department: "PWD Delhi",
+    workDescription: "Road expansion and asphalt carpeting work including drainage setup.",
+    agencyName: "PWD Delhi",
+    stateName: "Delhi",
+    country: "India",
+    tenderType: "Works",
     category: "Civil Works",
-    location: { state: "Delhi", city: "New Delhi" },
-    financials: { estimatedCost: 45000000, emdAmount: 900000, tenderFee: 5000 },
-    dates: { closingDate: new Date("2026-10-15") },
-    status: "ACTIVE"
+    subCategory: "Roads",
+    tenderValue: 45000000,
+    emdValue: 900000,
+    documentValue: 5000,
+    currencyId: "INR",
+    siteId: "SITE-01",
+    submissionDate: new Date("2026-10-15"),
+    openingDate: new Date("2026-10-16"),
+    tenderStatus: "ACTIVE",
+    isActive: true
   },
   {
-    tenderId: "TEN-2026-002",
+    tenderNumber: "TEN-2026-002",
+    tenderID: "TID-902",
     title: "Supply of IT Equipment and Networking Switches",
-    description: "Procurement of CISCO routers and Cat6 wiring for Western Railway HQ.",
-    department: "Indian Railways",
+    workDescription: "Procurement of CISCO routers and Cat6 wiring for Western Railway HQ.",
+    agencyName: "Indian Railways",
+    stateName: "Maharashtra",
+    country: "India",
+    tenderType: "Supply",
     category: "IT & Telecom",
-    location: { state: "Maharashtra", city: "Mumbai" },
-    financials: { estimatedCost: 12000000, emdAmount: 240000, tenderFee: 2000 },
-    dates: { closingDate: new Date("2026-10-05") },
-    status: "ACTIVE"
-  },
-  {
-    tenderId: "TEN-2026-003",
-    title: "Solar Panel Installation at AIIMS Campus",
-    description: "Design, supply, testing and commissioning of 500kW rooftop solar power system.",
-    department: "Ministry of Health",
-    category: "Electrical & Renewable",
-    location: { state: "Delhi", city: "New Delhi" },
-    financials: { estimatedCost: 28000000, emdAmount: 560000, tenderFee: 3500 },
-    dates: { closingDate: new Date("2026-11-01") },
-    status: "ACTIVE"
+    subCategory: "Networking",
+    tenderValue: 12000000,
+    emdValue: 240000,
+    documentValue: 2000,
+    currencyId: "INR",
+    siteId: "SITE-02",
+    submissionDate: new Date("2026-10-25"),
+    openingDate: new Date("2026-10-26"),
+    tenderStatus: "ACTIVE",
+    isActive: true
   }
 ];
 
 const seedDB = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
-    await Tender.deleteMany({}); // Old data clear karne ke liye
+    await Tender.deleteMany({});
     await Tender.insertMany(sampleTenders);
-    console.log("✅ Dummy Tenders Added Successfully!");
+    console.log("✅ Flat Schema Tenders Seeded Successfully!");
     process.exit();
   } catch (err) {
     console.error("❌ Error seeding DB:", err);

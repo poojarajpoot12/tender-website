@@ -13,12 +13,12 @@ function escapeRegex(text) {
 }
 
 // ==========================================
-// 1. SEARCH & FILTER TENDERS
+// 1. SEARCH & FILTER TENDERS (Flat Schema)
 // ==========================================
 router.get('/tenders/search', async (req, res) => {
   try {
     const { category, subCategory, q } = req.query;
-    let queryConditions = {};
+    let queryConditions = { isActive: true };
 
     const searchTerms = [];
     if (category) searchTerms.push(escapeRegex(category));
@@ -28,10 +28,10 @@ router.get('/tenders/search', async (req, res) => {
     if (searchTerms.length > 0) {
       const orConditions = searchTerms.flatMap((term) => [
         { category: { $regex: new RegExp(term, 'i') } },
-        { sector: { $regex: new RegExp(term, 'i') } },
+        { subCategory: { $regex: new RegExp(term, 'i') } },
         { title: { $regex: new RegExp(term, 'i') } },
-        { department: { $regex: new RegExp(term, 'i') } },
-        { authorityName: { $regex: new RegExp(term, 'i') } }
+        { agencyName: { $regex: new RegExp(term, 'i') } },
+        { tenderNumber: { $regex: new RegExp(term, 'i') } }
       ]);
 
       queryConditions.$or = orConditions;
@@ -45,7 +45,7 @@ router.get('/tenders/search', async (req, res) => {
 });
 
 // ==========================================
-// 2. EXCEL UPLOAD ROUTE (FIXED SCHEMA & UPSERT)
+// 2. EXCEL UPLOAD ROUTE (Updated for Flat Schema)
 // ==========================================
 router.post('/upload-excel', upload.single('file'), async (req, res) => {
   try {
@@ -68,63 +68,62 @@ router.post('/upload-excel', upload.single('file'), async (req, res) => {
     let updatedCount = 0;
 
     for (const [index, row] of rawData.entries()) {
-      const rawTenderId = row['Tender ID'] || row['tenderId'] || `TND-${Date.now()}-${index}`;
+      const rawTenderNumber = row['Tender Number'] || row['tenderNumber'] || row['Tender ID'] || row['tenderId'] || `TND-${Date.now()}-${index}`;
       const title = row['Title'] || row['title'] || 'Untitled Tender';
-      const authority = row['Authority'] || row['authorityName'] || row['Department'] || row['department'] || 'Government Authority';
+      const agency = row['Agency Name'] || row['agencyName'] || row['Authority'] || row['Department'] || 'Government Authority';
 
       // Parse Dates safely
-      const closeVal = row['submissionClose'] || row['Deadline'] || row['closingDate'] || row['Closing Date'];
-      const closingDateParsed = closeVal ? new Date(closeVal) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const closeVal = row['submissionDate'] || row['Submission Date'] || row['Deadline'] || row['closingDate'];
+      const submissionDateParsed = closeVal ? new Date(closeVal) : new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-      const pubVal = row['publishedDate'] || row['Published Date'];
-      const publishedDateParsed = pubVal ? new Date(pubVal) : new Date();
+      const pubVal = row['publicDate'] || row['Public Date'] || row['publishedDate'];
+      const publicDateParsed = pubVal ? new Date(pubVal) : new Date();
 
-      // Normalize Status
-      const rawStatus = row['Status'] || row['status'] || 'ACTIVE';
-      const normalizedStatus = String(rawStatus).toUpperCase().trim().includes('LIVE') ? 'ACTIVE' : 'ACTIVE';
-
-      // Fully Map to Upgraded Tender Model
+      // Fully Map to Flat Tender Model Fields
       const tenderPayload = {
-        tenderId: String(rawTenderId).trim(),
-        refNumber: String(row['refNumber'] || row['Ref Number'] || rawTenderId).trim(),
+        tenderNumber: String(rawTenderNumber).trim(),
+        tenderID: String(row['tenderID'] || row['TenderID'] || rawTenderNumber).trim(),
         title: String(title).trim(),
-        portalSource: String(row['portalSource'] || row['Portal Source'] || 'CPSE eProcurement').trim(),
-        authorityName: String(authority).trim(),
-        department: String(row['Department'] || row['department'] || authority).trim(),
-        authorityType: String(row['authorityType'] || 'PSU').trim().toUpperCase(),
-        
+        workDescription: String(row['workDescription'] || row['Work Description'] || row['Description'] || '').trim(),
+        searchKeyword: String(row['searchKeyword'] || '').trim(),
+        laguage: String(row['laguage'] || 'English').trim(),
+
+        publicDate: isNaN(publicDateParsed.getTime()) ? new Date() : publicDateParsed,
+        submissionDate: isNaN(submissionDateParsed.getTime()) ? new Date() : submissionDateParsed,
+        openingDate: row['openingDate'] ? new Date(row['openingDate']) : new Date(),
+
+        tenderValue: Number(row['tenderValue'] || row['Tender Value'] || row['Budget'] || 0),
+        emdValue: Number(row['emdValue'] || row['EMD'] || 0),
+        documentValue: Number(row['documentValue'] || row['Document Value'] || 0),
+
+        agencyName: String(agency).trim(),
+        stateName: String(row['stateName'] || row['State'] || 'Delhi').trim(),
+        location: String(row['location'] || row['Location'] || 'New Delhi').trim(),
+        address: String(row['address'] || '').trim(),
+        pinCode: String(row['pinCode'] || row['PIN'] || '110001').trim(),
+        country: String(row['country'] || 'India').trim(),
+
         tenderType: String(row['tenderType'] || row['Tender Type'] || 'Works').trim(),
-        sector: String(row['sector'] || row['Sector'] || row['category'] || 'Roads & Highways').trim(),
-        subCategory: String(row['category'] || row['Category'] || 'Civil Works').trim(),
-        scheme: String(row['scheme'] || '').trim(),
+        tenderCategory: String(row['tenderCategory'] || '').trim(),
+        category: String(row['category'] || row['Category'] || 'Civil Works').trim(),
+        subCategory: String(row['subCategory'] || row['SubCategory'] || '').trim(),
+        baseType: String(row['baseType'] || '').trim(),
 
-        location: {
-          state: String(row['state'] || row['State'] || 'Delhi').trim(),
-          city: String(row['location'] || row['Location'] || row['city'] || 'New Delhi').trim(),
-          pincode: String(row['pinCode'] || row['PIN'] || '110001').trim()
-        },
+        tenderURI: String(row['tenderURI'] || '').trim(),
+        tenderHtmlDoc: String(row['tenderHtmlDoc'] || '').trim(),
+        tenderPdf: String(row['tenderPdf'] || '').trim(),
+        tenderZipDoc: String(row['tenderZipDoc'] || '').trim(),
+        documentURL: String(row['documentURL'] || '').trim(),
 
-        financials: {
-          estimatedCost: Number(row['estimatedCost'] || row['Budget'] || row['budget'] || 0),
-          emdAmount: Number(row['emdAmount'] || row['EMD'] || row['emd'] || 0),
-          tenderFee: Number(row['tenderFee'] || row['Tender Fee'] || 0),
-          isEstValue: false
-        },
-
-        dates: {
-          publishedDate: isNaN(publishedDateParsed.getTime()) ? new Date() : publishedDateParsed,
-          closingDate: isNaN(closingDateParsed.getTime()) ? new Date() : closingDateParsed
-        },
-
-        stage: String(row['stage'] || 'LIVE').toUpperCase(),
-        status: normalizedStatus,
-        invitingOfficer: String(row['invitingOfficer'] || '').trim(),
-        paymentMode: String(row['paymentMode'] || 'Offline').trim()
+        tenderStatus: String(row['tenderStatus'] || 'ACTIVE').toUpperCase(),
+        entryStatus: String(row['entryStatus'] || '').trim(),
+        isActive: true,
+        isUploaded: true
       };
 
-      // Safe Upsert (Prevents Duplicate ID Crashes)
+      // Safe Upsert matching by tenderNumber
       const result = await Tender.updateOne(
-        { tenderId: tenderPayload.tenderId },
+        { tenderNumber: tenderPayload.tenderNumber },
         { $set: tenderPayload },
         { upsert: true }
       );
@@ -167,27 +166,23 @@ router.post('/sync-google-sheet', async (req, res) => {
     const rawData = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName]);
 
     for (const [index, row] of rawData.entries()) {
-      const rawTenderId = row['Tender ID'] || row['tenderId'] || `GS-${Date.now()}-${index}`;
+      const rawTenderNumber = row['Tender Number'] || row['tenderNumber'] || `GS-${Date.now()}-${index}`;
       const title = row['Title'] || row['title'] || 'Untitled Tender';
-      const authority = row['Authority'] || row['Department'] || 'Government Authority';
+      const agency = row['Agency Name'] || row['Agency'] || 'Government Authority';
 
       const tenderPayload = {
-        tenderId: String(rawTenderId).trim(),
-        refNumber: String(row['refNumber'] || rawTenderId).trim(),
+        tenderNumber: String(rawTenderNumber).trim(),
         title: String(title).trim(),
-        portalSource: 'Google Sheet Sync',
-        authorityName: String(authority).trim(),
-        department: String(authority).trim(),
-        sector: String(row['Sector'] || row['category'] || 'Roads & Highways').trim(),
-        
-        location: { state: String(row['State'] || row['state'] || 'Delhi').trim() },
-        financials: { estimatedCost: Number(row['Budget'] || row['budget'] || 0) },
-        dates: { closingDate: row['Deadline'] ? new Date(row['Deadline']) : new Date() },
-        status: 'ACTIVE'
+        agencyName: String(agency).trim(),
+        stateName: String(row['State'] || row['state'] || 'Delhi').trim(),
+        tenderValue: Number(row['Budget'] || row['tenderValue'] || 0),
+        submissionDate: row['Deadline'] ? new Date(row['Deadline']) : new Date(),
+        tenderStatus: 'ACTIVE',
+        isActive: true
       };
 
       await Tender.updateOne(
-        { tenderId: tenderPayload.tenderId },
+        { tenderNumber: tenderPayload.tenderNumber },
         { $set: tenderPayload },
         { upsert: true }
       );
@@ -212,19 +207,19 @@ router.get('/tenders', async (req, res) => {
 });
 
 // ==========================================
-// 5. SECTOR SUMMARY AGGREGATION
+// 5. SECTOR/CATEGORY SUMMARY AGGREGATION
 // ==========================================
 router.get('/sectors/summary', async (req, res) => {
   try {
     const summary = await Tender.aggregate([
       {
         $group: {
-          _id: "$sector",
+          _id: "$category",
           totalAwards: { $sum: 1 },
           totalBudget: { 
-            $sum: { $ifNull: ["$financials.estimatedCost", 0] } 
+            $sum: { $ifNull: ["$tenderValue", 0] } 
           },
-          statesCount: { $addToSet: "$location.state" }
+          statesCount: { $addToSet: "$stateName" }
         }
       },
       {

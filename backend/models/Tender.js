@@ -2,61 +2,92 @@
 const mongoose = require('mongoose');
 
 const tenderSchema = new mongoose.Schema({
-  tenderId: { type: String, required: true, unique: true, index: true },
-  refNumber: { type: String, index: true }, // e.g. 2026_NHAI_291809_1
+  // Identifiers & Core Numbers
+  tenderNumber: { type: String, required: true, unique: true, index: true },
+  tenderID: { type: String, index: true },
   title: { type: String, required: true },
-  description: { type: String },
-  
-  // Organization & Portal Info
-  authorityName: { type: String, required: true, index: true }, // e.g. National Highways Authority of India
-  portalSource: { type: String, required: true, index: true }, // e.g. CPSE, CPP eProcure, GeM, RLY IREPS
-  authorityType: { type: String, enum: ['CENTRAL', 'STATE', 'PSU', 'OTHER'], default: 'PSU', index: true },
-  
+  workDescription: { type: String },
+  searchKeyword: { type: String, index: true },
+  laguage: { type: String, default: 'English' },
+
+  // Dates & Timeline
+  publicDate: { type: Date, index: true },
+  purchaseFromDate: { type: Date },
+  purchaseToDate: { type: Date },
+  submissionDate: { type: Date, index: true },
+  openingDate: { type: Date, index: true },
+  preBidMeetingDate: { type: Date },
+
+  // Financial & Values
+  tenderValue: { type: Number, index: true },
+  emdValue: { type: Number },
+  documentValue: { type: Number },
+
+  // IDs & Relational Keys
+  countryId: { type: String },
+  stateId: { type: String },
+  cityId: { type: String },
+  siteID: { type: String },
+  agencyID: { type: String },
+  currencyId: { type: String },
+
+  // Agency & Location Information
+  agencyName: { type: String, index: true },
+  stateName: { type: String, index: true },
+  location: { type: String },
+  address: { type: String },
+  pinCode: { type: String },
+  country: { type: String, default: 'India', index: true },
+
+  // Contact Information
+  contactPerson: { type: String },
+  contactEmail: { type: String },
+  contactPhone: { type: String },
+  contactFax: { type: String },
+
   // Categorization & Classification
-  tenderType: { type: String, enum: ['Works', 'Supply', 'Services', 'Consulting', 'Leasing', 'Other'], index: true },
-  sector: { type: String, index: true }, // e.g. Civic, Railways, Roads & Highways, Power
-  subCategory: { type: String, index: true }, // e.g. Water, Buildings, Bridges, SITC, Maintenance
-  scheme: { type: String, index: true }, // e.g. Jal Jeevan Mission, AMRUT, Smart City, PMGSY
-  
-  // Location Details
-  location: {
-    state: { type: String, required: true, index: true },
-    city: { type: String, index: true },
-    pincode: { type: String }
-  },
-  
-  // Financials
-  financials: {
-    estimatedCost: { type: Number, required: true, index: true }, // Numeric value in INR
-    currency: { type: String, default: 'INR' },
-    isEstValue: { type: Boolean, default: false }, // If value is estimated (e.g. 1,000 Cr+ EST)
-    emdAmount: { type: Number },
-    tenderFee: { type: Number }
-  },
-  
-  // Dates
-  dates: {
-    publishedDate: { type: Date, default: Date.now, index: true },
-    closingDate: { type: Date, required: true, index: true }
-  },
-  
-  // Stage & Status
-  stage: { type: String, enum: ['LIVE', 'CLOSED', 'RESULTS', 'PAST_STAGES'], default: 'LIVE', index: true },
-  status: { type: String, enum: ['ACTIVE', 'EXPIRED', 'CANCELLED'], default: 'ACTIVE', index: true },
-  documentUrl: { type: String }
+  tenderType: { type: String, index: true },
+  tenderCategory: { type: String, index: true },
+  category: { type: String, index: true },
+  subCategory: { type: String, index: true },
+  classificationStatus: { type: String, index: true },
+  baseType: { type: String, index: true },
+
+  // URLs & Documents
+  tenderURI: { type: String },
+  tenderHtmlDoc: { type: String },
+  tenderPdf: { type: String },
+  tenderZipDoc: { type: String },
+  documentURL: { type: String },
+
+  // Status & Control Flags
+  tenderStatus: { type: String, index: true },
+  entryStatus: { type: String, index: true },
+  isActive: { type: Boolean, default: true, index: true },
+  isUploaded: { type: Boolean, default: false, index: true },
+
+  // Corrigendum Details
+  isCorrigendum: { type: Boolean, default: false },
+  corrigendumType: { type: String },
+
+  // Audit / Metadata Tracking
+  createdBy: { type: String },
+  createdDate: { type: Date, default: Date.now },
+  updatedBy: { type: String },
+  updatedDate: { type: Date, default: Date.now }
+
 }, { timestamps: true });
 
-// Compound Compound Text Indexing for Fast Keyword Searches
+// Text Index for Fast Keyword & Multi-field Searches
 tenderSchema.index({
+  tenderNumber: 'text',
   title: 'text',
-  description: 'text',
-  authorityName: 'text',
-  refNumber: 'text',
-  sector: 'text',
-  subCategory: 'text'
+  workDescription: 'text',
+  agencyName: 'text',
+  stateName: 'text',
+  category: 'text',
+  subCategory: 'text',
+  searchKeyword: 'text'
 });
-
-// Compound Indexing for High Performance Multi-filtering
-tenderSchema.index({ 'location.state': 1, 'financials.estimatedCost': 1, stage: 1 });
 
 module.exports = mongoose.model('Tender', tenderSchema);

@@ -1,11 +1,13 @@
+// backend/routes/authRoutes.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { sendEmailOtp } = require('../services/emailService');
 
 // ==========================================
-// 1. SEND EMAIL OTP ROUTE
+// 1. SEND EMAIL OTP ROUTE (Updated with Live Nodemailer)
 // ==========================================
 router.post('/send-otp', async (req, res) => {
   try {
@@ -43,13 +45,16 @@ router.post('/send-otp', async (req, res) => {
       { new: true, upsert: true }
     );
 
-    console.log("\n==========================================");
-    console.log(`🔑 OTP GENERATED FOR [${cleanEmail}]: ${generatedOTP}`);
-    console.log("==========================================\n");
+    // Send Real Email via Nodemailer
+    const emailResult = await sendEmailOtp(cleanEmail, generatedOTP);
+    if (!emailResult.success) {
+      return res.status(500).json({ message: 'Failed to send verification email. Check server configuration.' });
+    }
+
+    console.log(`🔑 OTP SENT TO [${cleanEmail}]: ${generatedOTP}`);
 
     return res.status(200).json({
-      message: 'OTP generated successfully!',
-      otp: generatedOTP
+      message: 'OTP sent successfully to your email!'
     });
   } catch (err) {
     console.error('Send OTP Error:', err);
@@ -62,37 +67,29 @@ router.post('/send-otp', async (req, res) => {
 // ==========================================
 router.post('/verify-otp', async (req, res) => {
   try {
-    console.log("📩 INCOMING VERIFY BODY:", req.body);
     const email = req.body.email;
     const otpInput = req.body.otp || req.body.code || req.body.otpCode;
 
     if (!email || !otpInput) {
-      console.log("❌ REJECTED 400: Email or OTP missing in body");
       return res.status(400).json({ message: 'Both email and OTP code are required.' });
     }
 
     const cleanEmail = String(email).toLowerCase().trim();
     const cleanOtp = String(otpInput).trim();
 
-    // Find user using case-insensitive match
     const user = await User.findOne({ email: cleanEmail });
 
     if (!user) {
-      console.log(`❌ REJECTED 400: No record found for ${cleanEmail}`);
       return res.status(400).json({ message: 'User record not found. Click Get OTP again.' });
     }
 
     const storedOtp = user.otp ? String(user.otp).trim() : '';
 
-    console.log(`🔍 COMPARING -> DB OTP: "${storedOtp}" | INPUT OTP: "${cleanOtp}"`);
-
     if (!storedOtp || storedOtp !== cleanOtp) {
-      console.log("❌ REJECTED 400: OTP Mismatch");
       return res.status(400).json({ message: 'Invalid OTP code. Please re-check.' });
     }
 
     if (!user.otpExpires || new Date(user.otpExpires).getTime() < Date.now()) {
-      console.log("❌ REJECTED 400: OTP Expired");
       return res.status(400).json({ message: 'OTP has expired. Request a new code.' });
     }
 
@@ -101,8 +98,6 @@ router.post('/verify-otp', async (req, res) => {
     user.otp = null;
     user.otpExpires = null;
     await user.save();
-
-    console.log(`✅ VERIFICATION SUCCESSFUL FOR: ${cleanEmail}`);
 
     const token = jwt.sign(
       { userId: user._id, email: user.email },
@@ -208,12 +203,10 @@ router.post('/send-mobile-otp', async (req, res) => {
       return res.status(404).json({ message: 'User record not found.' });
     }
 
-    console.log("\n==========================================");
     console.log(`📱 MOBILE OTP FOR [${mobileNumber}]: ${mobileOtp}`);
-    console.log("==========================================\n");
 
     return res.status(200).json({ 
-      message: 'Mobile OTP generated! Check backend terminal.', 
+      message: 'Mobile OTP generated successfully!', 
       otp: mobileOtp 
     });
   } catch (err) {
@@ -223,7 +216,7 @@ router.post('/send-mobile-otp', async (req, res) => {
 });
 
 // ==========================================
-// 5. VERIFY MOBILE OTP ROUTE (ADDED & FIXED)
+// 5. VERIFY MOBILE OTP ROUTE
 // ==========================================
 router.post('/verify-mobile-otp', async (req, res) => {
   try {
@@ -260,8 +253,6 @@ router.post('/verify-mobile-otp', async (req, res) => {
       user.mobileNumber = String(mobileNumber).trim();
     }
     await user.save();
-
-    console.log(`✅ MOBILE VERIFICATION SUCCESSFUL FOR: ${cleanEmail}`);
 
     return res.status(200).json({
       message: 'Mobile number verified successfully!',
