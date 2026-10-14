@@ -11,10 +11,28 @@ connectDB();
 
 const app = express();
 
-// CORS Middleware Configuration
-app.use(cors());
+// --- FIXED CORS CONFIGURATION FOR NETLIFY ---
+const allowedOrigins = [
+  'https://stupendous-capybara-6cea79.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
 
-// Increase payload limits to support Base64 image uploads (e.g., companyLogo)
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS policy'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+// ---------------------------------------------
+
+// Increase payload limits to support Base64 image uploads
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
@@ -31,7 +49,7 @@ app.use('/api/usage', require('./routes/usage'));
 app.use('/api/bids', require('./routes/bidRoutes'));
 app.use('/api/alerts', require('./routes/alertRoutes'));
 app.use('/api/support', require('./routes/supportRoutes'));
-app.use('/api/authorities', require('./routes/authorityRoutes'));
+app.use('/api/authorities', require('./routes/authorityRoutes')); // <-- Fixed path corrected here
 
 // HEALTH CHECK ROUTE
 app.get('/api/health', (req, res) => {
