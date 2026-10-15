@@ -52,10 +52,18 @@ router.get('/tenders/search', async (req, res) => {
 });
 
 // ==========================================
-// 2. EXCEL UPLOAD ROUTE (Fixed tenderId Field)
+// 2. EXCEL UPLOAD ROUTE (Auto-Drops Problematic Index)
 // ==========================================
 router.post('/upload-excel', upload.single('file'), async (req, res) => {
   try {
+    // Automatically drop the annoying unique index causing null conflicts
+    try {
+      await Tender.collection.dropIndex('tenderId_1');
+      console.log('✅ Successfully dropped conflicting tenderId_1 index');
+    } catch (indexErr) {
+      // Index might already be dropped, safe to ignore
+    }
+
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Kripya Excel ya CSV file select karein!' });
     }
@@ -90,10 +98,9 @@ router.post('/upload-excel', upload.single('file'), async (req, res) => {
       const pubVal = row['publicDate'] || row['Public Date'] || row['publishedDate'];
       const publicDateParsed = pubVal ? new Date(pubVal) : new Date();
 
-      // Fully Map to Flat Tender Model Fields with correct lowercase 'tenderId'
       const tenderPayload = {
         tenderNumber: String(rawTenderNumber).trim(),
-        tenderId: String(rawTenderID).trim(), // <-- Fixed to lowercase 'tenderId'
+        tenderId: String(rawTenderID).trim(),
         title: String(title).trim(),
         workDescription: String(row['workDescription'] || row['Work Description'] || row['Description'] || '').trim(),
         searchKeyword: String(row['searchKeyword'] || '').trim(),
@@ -132,7 +139,6 @@ router.post('/upload-excel', upload.single('file'), async (req, res) => {
         isUploaded: true
       };
 
-      // Safe Upsert matching by tenderNumber
       const result = await Tender.updateOne(
         { tenderNumber: tenderPayload.tenderNumber },
         { $set: tenderPayload },
