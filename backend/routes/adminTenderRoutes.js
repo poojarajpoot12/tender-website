@@ -52,7 +52,7 @@ router.get('/tenders/search', async (req, res) => {
 });
 
 // ==========================================
-// 2. EXCEL UPLOAD ROUTE (Updated & Null-Safe IDs)
+// 2. EXCEL UPLOAD ROUTE (Fixed tenderId Field)
 // ==========================================
 router.post('/upload-excel', upload.single('file'), async (req, res) => {
   try {
@@ -75,11 +75,10 @@ router.post('/upload-excel', upload.single('file'), async (req, res) => {
     let updatedCount = 0;
 
     for (const [index, row] of rawData.entries()) {
-      // Generate unique safe fallbacks to prevent null duplicate key errors
       const uniqueSuffix = `${Date.now()}-${index}-${Math.floor(Math.random() * 10000)}`;
       
       const rawTenderNumber = row['Tender Number'] || row['tenderNumber'] || row['Tender ID'] || row['tenderId'] || `TND-${uniqueSuffix}`;
-      const rawTenderID = row['tenderID'] || row['TenderID'] || row['tenderId'] || row['Tender ID'] || `TID-${uniqueSuffix}`;
+      const rawTenderID = row['tenderId'] || row['tenderID'] || row['TenderID'] || row['Tender ID'] || `TID-${uniqueSuffix}`;
       
       const title = row['Title'] || row['title'] || 'Untitled Tender';
       const agency = row['Agency Name'] || row['agencyName'] || row['Authority'] || row['Department'] || 'Government Authority';
@@ -91,10 +90,10 @@ router.post('/upload-excel', upload.single('file'), async (req, res) => {
       const pubVal = row['publicDate'] || row['Public Date'] || row['publishedDate'];
       const publicDateParsed = pubVal ? new Date(pubVal) : new Date();
 
-      // Fully Map to Flat Tender Model Fields with string conversions
+      // Fully Map to Flat Tender Model Fields with correct lowercase 'tenderId'
       const tenderPayload = {
         tenderNumber: String(rawTenderNumber).trim(),
-        tenderID: String(rawTenderID).trim(),
+        tenderId: String(rawTenderID).trim(), // <-- Fixed to lowercase 'tenderId'
         title: String(title).trim(),
         workDescription: String(row['workDescription'] || row['Work Description'] || row['Description'] || '').trim(),
         searchKeyword: String(row['searchKeyword'] || '').trim(),
@@ -185,7 +184,7 @@ router.post('/sync-google-sheet', async (req, res) => {
 
       const tenderPayload = {
         tenderNumber: String(rawTenderNumber).trim(),
-        tenderID: String(row['tenderID'] || row['TenderID'] || rawTenderNumber).trim(),
+        tenderId: String(row['tenderId'] || row['tenderID'] || row['TenderID'] || rawTenderNumber).trim(),
         title: String(title).trim(),
         agencyName: String(agency).trim(),
         stateName: String(row['State'] || row['state'] || 'Delhi').trim(),
