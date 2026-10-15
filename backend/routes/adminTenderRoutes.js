@@ -4,9 +4,16 @@ const router = express.Router();
 const multer = require('multer');
 const xlsx = require('xlsx');
 const fs = require('fs');
+const path = require('path');
 const Tender = require('../models/Tender');
 
-const upload = multer({ dest: 'uploads/' });
+// Ensure uploads directory exists on Render / Cloud server
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const upload = multer({ dest: uploadDir });
 
 function escapeRegex(text) {
   return text ? text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") : "";
