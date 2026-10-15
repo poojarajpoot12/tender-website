@@ -13,7 +13,7 @@ const app = express();
 
 // --- FIXED CORS CONFIGURATION FOR NETLIFY ---
 const allowedOrigins = [
-  'https://earnest-phoenix-f83183.netlify.app/',
+  'https://keen-fox-146ac8.netlify.app',
   'http://localhost:5173',
   'http://localhost:3000'
 ];
