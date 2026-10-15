@@ -38,6 +38,14 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 initDailyCron();
 
+// ROOT WELCOME ROUTE
+app.get('/', (req, res) => {
+  res.status(200).json({ 
+    success: true, 
+    message: 'Welcome to InfraLens Backend API Server is Running!' 
+  });
+});
+
 // ROUTES CONFIGURATION
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/user', require('./routes/userRoutes'));
@@ -49,7 +57,7 @@ app.use('/api/usage', require('./routes/usage'));
 app.use('/api/bids', require('./routes/bidRoutes'));
 app.use('/api/alerts', require('./routes/alertRoutes'));
 app.use('/api/support', require('./routes/supportRoutes'));
-app.use('/api/authorities', require('./routes/authorityRoutes')); // <-- Fixed path corrected here
+app.use('/api/authorities', require('./routes/authorityRoutes'));
 
 // HEALTH CHECK ROUTE
 app.get('/api/health', (req, res) => {
